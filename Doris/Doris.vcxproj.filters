@@ -18,5 +18,49 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Token.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Lexer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Parser.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Regex.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="AST.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="NFA.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DFA.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Token.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Lexer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Parser.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Regex.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="AST.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="NFA.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DFA.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

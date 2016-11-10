@@ -7,7 +7,7 @@ using std::cin;
 
 void test()
 {
-
+	L"ÄãºÃÂî";
 }
 
 int main()

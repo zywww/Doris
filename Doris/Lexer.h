@@ -8,10 +8,10 @@ class Lexer
 public:
 	Lexer(const char *regex);
 
-	Token		GetNextToken();
+	Token			GetNextToken();
 
 private:
-	void			Error();
+	void			Error(); // ´Ê·¨´íÎó£¬assert
 
 	const char*		regex_;
 };

@@ -39,7 +39,7 @@ enum class TokenType
 class Token
 {
 public:
-	Token(TokenType type, char ch1, char ch2 = '\0');
+	Token(TokenType type, char ch1, char ch2);
 
 private:
 	TokenType		type_;

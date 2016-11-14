@@ -32,14 +32,14 @@ enum class TokenType
 	BACKREF,		// \n 后向引用，n为一位数字，引用以匹配的分组号
 	NAMEREF,		// \k 命名后向引用
 
-	INTEGER			// 用于 {n, m}
+	END
 };
 
 // TODO 要用 struct 还是 class
 class Token
 {
 public:
-	Token(TokenType type, char ch1, char ch2);
+	Token(TokenType type, char ch1 = '\0', char ch2 = '\0');
 
 private:
 	TokenType		type_;

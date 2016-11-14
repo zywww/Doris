@@ -11,6 +11,7 @@ public:
 	Parser(const std::string &regex);
 
 	ASTNode* Parse();		// 对正则表达式进行语法分析，若错误则中断，若成功则返回 AST 根结点
+	bool isDFA();
 
 private:
 	void Error();			// 语法错误
@@ -18,6 +19,7 @@ private:
 
 	const std::string&	regex_;
 	Lexer				lexer_;
+	bool				isDFA_  = false;
 };
 
 #endif 

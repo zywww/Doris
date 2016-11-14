@@ -12,21 +12,27 @@ class Regex
 public:
 	Regex(const std::string regex);
 
-	// 调用方法前，先判断是否 Parse，若未 Parse，则调用 Parse 方法
-	// Parse 方法调用语法分析器的 Parse，得到 AST 根结点，
-	// 然后根据语法分析器的标志判断是生成 DFA 还是 NFA，然后获得对应的
-	// 自动机结点，接口方法通过运行自动机完成对应功能
+	// match 先调用 parse 再调用 find 获得第一个搜索到的位置，
 	bool				Match(const std::string &matchContent);
-	bool				Search();
-	bool				Replace();
+	bool				Search();	// 暂时不用
+	bool				Replace();	// 暂时不用
 
 private:
 	const std::string	regex_;
-	bool				parse_;
-	NFAState*			NFAStart;
-	DFAState*			DFAStart;
+	Parser				parser_;
+	bool				hasParse_;
+	NFAState*			NFAStart_;
+	DFAState*			DFAStart_;
+	bool				isDFA_;
 
+	// 调用 parse_ 的 parse 方法，获得 AST 根结点，然后根据 parse_ 的标志判断是否可以生成 DFA，
+	// 然后调用 AST 根节点对应的构造自动机方法，并设置 dfaStart 成员，
 	bool				Parse();
+	// 在接口中调用此方法，此方法返回字符串中搜索到的第一个位置, 
+	// 根据 match 标志判断是否是匹配操作，若是匹配，则自动机必须运行一定的长度
+	// 会根据 isDFA_ 来选择调用 rundfa 或者 runnfa ？
+	// 找不到会返回 -1
+	std::pair<int, int>	Find(int begin, const std::string &matchContent, bool match); 
 };
 
 #endif 

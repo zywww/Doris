@@ -4,7 +4,7 @@
 enum class TokenType
 {
 	SIMPLECHAR,		// 即用来匹配的ASCII字符
-	WIDECHAR,		// 宽字符
+//	WIDECHAR,		// 宽字符
 
 	OR,				// |
 	STAR,			// *
@@ -18,6 +18,7 @@ enum class TokenType
 	RBRACKET,		// ]
 	LP,				// (   
 	RP,				// )
+	BACKSLASH,		// \ 反斜杠
 
 	WORD,			// \w  ==  [a-zA-Z0-9_]
 	NOT_WORD,		// \W  ==  [^a-zA-Z0-9_]
@@ -41,7 +42,7 @@ class Token
 public:
 	Token(TokenType type, char ch1 = '\0', char ch2 = '\0');
 
-private:
+//private:
 	TokenType		type_;
 	char			lexeme_[2];	// 只有匹配字符才会用到 lexeme_，简单字符只用到 1 个，
 								// 宽字符用到 2 个字符

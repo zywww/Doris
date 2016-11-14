@@ -10,13 +10,26 @@ enum class State
 {
 	START,
 	BACKSLASH,
-
 };
 
 Lexer::Lexer(const string &regex) : regex_(regex)
 {
-	// cout << regex_ << endl;
+	// 因为一个正则表达式和一个 lexer 对应，所以解析放在构造函数中
 	Analyze();
+}
+
+Token Lexer::GetNextToken()
+{
+	if (tokenIndex_ < steam_.size())
+		return steam_[tokenIndex_++];
+	else
+		return Token(TokenType::END);
+}
+
+void Lexer::Error(const string &info)
+{
+	cout << info << endl;
+	assert(false);
 }
 
 void Lexer::Analyze()
@@ -96,7 +109,13 @@ void Lexer::Analyze()
 				else
 					Error("\\x 后面的十六进制字符不合法");
 				break;
-			default: push(TokenType::SIMPLECHAR, ch); break;
+			default: 
+				if (ch >= '1' && ch <= '9')
+				{
+					push(TokenType::BACKSLASH);
+					--index;
+				}
+				push(TokenType::SIMPLECHAR, ch); break;
 			}
 		}
 	}
@@ -104,16 +123,3 @@ void Lexer::Analyze()
 		Error("空的转义字符");
 }
 
-Token Lexer::GetNextToken()
-{
-	if (tokenIndex_ < steam_.size())
-		return steam_[tokenIndex_++];
-	else
-		return Token(TokenType::END);
-}
-
-void Lexer::Error(const string &info)
-{
-	cout << info << endl;
-	assert(false);
-}

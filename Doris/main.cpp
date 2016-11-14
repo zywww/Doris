@@ -16,6 +16,11 @@ void testLexer()
 	//Lexer lex4(string("\\xq"));
 	//Lexer lex5(string("\\xqq"));
 	//Lexer lex6(string("\\x"));
+	Lexer lex7(string("\\1abc"));
+	Lexer lex8(string("\\0abc"));
+	auto temp = lex7.GetNextToken();
+	while (temp.type_ != TokenType::END)
+		temp = lex7.GetNextToken();
 
 	cout << "ÏÂ¶Ïµã" << endl;
 }

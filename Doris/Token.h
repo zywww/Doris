@@ -1,6 +1,9 @@
 #ifndef DORIS_TOKEN_H__
 #define DORIS_TOKEN_H__
 
+// 如果两个符号有不同语义，则应该给他设计一种 token
+// 应该把 (?: 和 (?= 等等分析为一个词法单元吗？看看别的实现
+// 
 enum class TokenType
 {
 	SIMPLECHAR,		// 即用来匹配的ASCII字符
@@ -37,15 +40,13 @@ enum class TokenType
 };
 
 // TODO 要用 struct 还是 class
-class Token
+struct Token
 {
-public:
-	Token(TokenType type, char ch1 = '\0', char ch2 = '\0');
+	Token(TokenType type, char ch = '\0');
 
-//private:
 	TokenType		type_;
-	char			lexeme_[2];	// 只有匹配字符才会用到 lexeme_，简单字符只用到 1 个，
-								// 宽字符用到 2 个字符
+	char			lexeme_;	// 只有匹配字符才会用到 lexeme_，简单字符只用到 1 个，
+								// 还有 \number 的反向引用，将 number 存在 lexeme
 };
 
 #endif

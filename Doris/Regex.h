@@ -10,6 +10,7 @@
 class Regex
 {
 public:
+	// 可以在构造函数中编译正则表达式，因为一个 regex 类表示一个正则表达式
 	Regex(const std::string regex);
 
 	// match 先调用 parse 再调用 find 获得第一个搜索到的位置，

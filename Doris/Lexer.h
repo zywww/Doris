@@ -12,17 +12,22 @@ public:
 
 	// 如果 tokenStream 到达末尾，返回 END
 	Token							GetNextToken();	
+	// 该正则表达式是否可以生成 DFA
+	bool							GetIsDFA();
+	
 
 private:
 	// 词法错误，打印错误信息，直接 assert false
 	void							Error(const std::string &info);
-
 	// 因为正则表达式一般不会很长，所以可以一次性解析成词法单元流
 	void							Analyze();
+	// 遍历一遍词法单元，判断是否有扩展的成分，若没有则可以生成 DFA
+	bool							isDFA();
 		
 	const std::string&				regex_;
-	std::vector<Token>				steam_;
+	std::vector<Token>				stream_;
 	std::vector<Token>::size_type	tokenIndex_ = 0;
+	bool							canGenDFA_;
 };
 
 #endif

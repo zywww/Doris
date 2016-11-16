@@ -16,14 +16,20 @@ Lexer::Lexer(const string &regex) : regex_(regex)
 {
 	// 因为一个正则表达式和一个 lexer 对应，所以解析放在构造函数中
 	Analyze();
+	canGenDFA_ = isDFA();
 }
 
 Token Lexer::GetNextToken()
 {
-	if (tokenIndex_ < steam_.size())
-		return steam_[tokenIndex_++];
+	if (tokenIndex_ < stream_.size())
+		return stream_[tokenIndex_++];
 	else
 		return Token(TokenType::END);
+}
+
+bool Lexer::GetIsDFA()
+{
+	return canGenDFA_;
 }
 
 void Lexer::Error(const string &info)
@@ -36,12 +42,14 @@ void Lexer::Analyze()
 {
 	State state = State::START;
 	string::size_type index = 0;
+	// 将词法单元存进 stream_
 	auto push = [&](TokenType type, char ch = '\0') -> void
 	{
-		steam_.push_back(Token(type, ch));	
+		stream_.push_back(Token(type, ch ));	
 		++index;
 		state = State::START;
 	};
+	// 计算两位十六进制值，若不合法，返回 -1
 	auto getHexVal = [](char ch1, char ch2) -> char
 	{
 		int ans = 0;
@@ -97,6 +105,7 @@ void Lexer::Analyze()
 			case 'D': push(TokenType::NOT_DIGIT); break;
 			case 'b': push(TokenType::BOUND); break;
 			case 'B': push(TokenType::NOT_BOUND); break;
+			case 'k': push(TokenType::NAMEREF); break;
 			case 'x': 
 				if (index + 3 > regex_.size())
 					Error("\\x 后面应匹配两位十六进制字符");
@@ -111,11 +120,10 @@ void Lexer::Analyze()
 				break;
 			default: 
 				if (ch >= '1' && ch <= '9')
-				{
-					push(TokenType::BACKSLASH);
-					--index;
-				}
-				push(TokenType::SIMPLECHAR, ch); break;
+					push(TokenType::BACKREF, ch);
+				else
+					push(TokenType::SIMPLECHAR, ch);
+				break;
 			}
 		}
 	}
@@ -123,3 +131,41 @@ void Lexer::Analyze()
 		Error("空的转义字符");
 }
 
+bool Lexer::isDFA()
+{
+	for (decltype(stream_.size()) i = 0; i < stream_.size(); ++i)
+	{
+		auto token = stream_[i];
+		switch (token.type_)
+		{
+		case TokenType::BACKREF:	// 含有 \number 的不是纯正则
+		case TokenType::NAMEREF:	// 含有 \k 的不是纯正则
+		case TokenType::BOUND:		// 含有 \b
+		case TokenType::NOT_BOUND:	// 含有 \B
+		case TokenType::DOLLAR:		// 含有 $
+			return false;
+			break;
+		case TokenType::NEGATE:		// 含有 ^ 且 不是 [^] 形式的
+			if (i == 0 || stream_[i - 1].type_ != TokenType::LBRACKET)
+				return false;
+			break;
+			// 这里的 break 没有作用，但是如果以后上面的 return 语句不要了，这个 break 
+			// 就可以明确这里的语意，说明这是一个段落
+		case TokenType::RBRACE:		// 在 } * + ? 后面跟着 ? 表示非贪婪的
+		case TokenType::STAR:
+		case TokenType::PLUS:
+		case TokenType::QUERY:
+			if (i + 1 < stream_.size() && stream_[i + 1].type_ == TokenType::QUERY)
+				return false;
+			break;
+		case TokenType::LP:			// 含有 ( 的且不是 (?: 的都不是纯正则，都属于分组构造
+			if (i + 1 < stream_.size() && i + 2 < stream_.size() &&
+				(stream_[i + 1].type_ != TokenType::QUERY ||
+				stream_[i + 2].lexeme_ != ':'))
+				return false;
+			break;
+		}
+	}
+	return true;
+
+}

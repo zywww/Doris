@@ -43,6 +43,7 @@ void testLexer()
 	Lexer lex25(string("a(?<name>w+)"));
 	Lexer lex26(string("a(?=ad)"));
 	Lexer lex27(string("a(?!ad)"));
+	Lexer lex28(string("-\\-"));
 
 	cout << "ÏÂ¶Ïµã" << endl;
 }

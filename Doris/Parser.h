@@ -17,6 +17,9 @@ private:
 	void				Error();			// 语法错误
 	void				GetNextToken();	// 通过 lexer_ 获取下个词法单元
 
+
+	
+
 	const std::string&	regex_;
 	Lexer				lexer_;
 	bool				isDFA_  = false;

@@ -22,6 +22,7 @@ enum class TokenType
 	LP,				// (   
 	RP,				// )
 	BACKSLASH,		// \ 反斜杠
+	MINUS,			// - 连字符	若在 [] 外，则 MINUS 和 simplechar 的 '-' 是同语义的
 
 	WORD,			// \w  ==  [a-zA-Z0-9_]
 	NOT_WORD,		// \W  ==  [^a-zA-Z0-9_]

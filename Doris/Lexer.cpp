@@ -1,10 +1,15 @@
 #include <cassert>
 #include <iostream>
+#include <regex>
+#include <vector>
+#include <utility>
 #include "Lexer.h"
 
 using std::cout;
 using std::endl;
 using std::string;
+using std::vector;
+using std::pair;
 
 enum class State
 {
@@ -35,7 +40,7 @@ bool Lexer::GetIsDFA()
 void Lexer::Error(const string &info)
 {
 	cout << info << endl;
-	assert(false);
+	throw info;
 }
 
 void Lexer::Analyze()
@@ -86,6 +91,7 @@ void Lexer::Analyze()
 			case ']': push(TokenType::RBRACKET); break;
 			case '(': push(TokenType::LP); break;
 			case ')': push(TokenType::RP); break;
+			case '-': push(TokenType::MINUS); break;
 			case '\\': state = State::BACKSLASH; ++index; break;
 			default: push(TokenType::SIMPLECHAR, ch); break;
 			}
@@ -168,4 +174,37 @@ bool Lexer::isDFA()
 	}
 	return true;
 
+}
+
+char* Lexer::DivideCharSet()
+{
+	// DFA 才需要，NFA 有功能边
+	char* table = new char[128];
+	return table;
+	/*
+	vector<pair<char, char>> pvec;
+	int index = 0;
+	while (index < stream_.size())
+	{
+		auto token = stream_[index];
+		switch (token.type_)
+		{
+		case TokenType::SIMPLECHAR: 
+			pvec.push_back(std::make_pair(token.lexeme_, token.lexeme_)); 
+			break;
+		case TokenType::LBRACKET: 
+			++index;
+			while (index < stream_.size() && stream_[index].type_ != TokenType::RBRACKET)
+			{
+				switch (stream_[index].type_)
+				{
+				case TokenType::WORD: 
+					pvec.push_back(std::make_pair())
+				}
+			}
+			break;
+		}
+
+	}
+	*/
 }

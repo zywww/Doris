@@ -23,6 +23,8 @@ private:
 	void							Analyze();
 	// 遍历一遍词法单元，判断是否有扩展的成分，若没有则可以生成 DFA
 	bool							isDFA();
+	// 分析一遍词法单元，确定字符集
+	char*							DivideCharSet();	// 在 regex 类的析构函数中回收该空间
 		
 	const std::string&				regex_;
 	std::vector<Token>				stream_;

@@ -10,8 +10,52 @@
 class ASTNode
 {
 public:
+	virtual std::pair<NFAState*, NFAState*> ConstructNFA();
 };
 
+class ASTOR : public ASTNode
+{
+public:
+	virtual std::pair<NFAState*, NFAState*> ConstructNFA();
+
+private:
+	ASTNode*	left_;
+	ASTNode*	right_;
+};
+
+class ASTCat : public ASTNode
+{
+
+};
+
+class ASTRepeat : public ASTNode
+{
+public:
+	ASTNode*	node_;
+	bool		greedy_;
+	int			min_;
+	int			max_;
+};
+
+
+
+class ASTCharClass : public ASTNode
+{
+public:
+	char begin;
+	char end;
+};
+
+class ASTCharacter : public ASTNode
+{
+public:
+	char ch;
+};
+
+
+
+
+/*
 class ASTGenDFA : ASTNode
 {
 public:
@@ -33,6 +77,8 @@ std::tuple<int **, int, int> constructDFA(ASTGenDFA *root);
 // 生成字符集映射，如果是 DFA 的话，则需运行这个函数，可以缩小 DFA 转换表的大小
 // 返回转换表，长度一般是 256
 int* GenCharClass(ASTGenDFA* root);
+*/
+
 
 
 #endif

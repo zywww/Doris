@@ -11,27 +11,43 @@
 class ASTNode
 {
 public:
+	ASTNode();
+
 	virtual std::pair<NFAState*, NFAState*> ConstructNFA();
 };
 
 class ASTOR : public ASTNode
 {
 public:
+	ASTOR();
+
+	void Push(ASTNode* node);
 	virtual std::pair<NFAState*, NFAState*> ConstructNFA();
 
 private:
-	std::vector<ASTNode*> astvec;
+	std::vector<ASTNode*> nodeVec_;
 };
 
 class ASTCat : public ASTNode
 {
+public:
+	ASTCat();
+
+	void Push(ASTNode* node);
+	virtual std::pair<NFAState*, NFAState*> ConstructNFA();
+
 private:
-	std::vector<ASTNode*> astvec;
+	std::vector<ASTNode*> nodeVec_;
 };
 
 class ASTRepeat : public ASTNode
 {
 public:
+	ASTRepeat(ASTNode* node, bool greedy, int min, int max);
+
+	virtual std::pair<NFAState*, NFAState*> ConstructNFA();
+
+private:
 	ASTNode*	node_;
 	bool		greedy_;
 	int			min_;
@@ -41,46 +57,82 @@ public:
 class ASTCharClass : public ASTNode
 {
 public:
-	std::vector<std::pair<int, int>> ranges;
+	ASTCharClass();
+
+	void Push(std::pair<char, char> range);
+	virtual std::pair<NFAState*, NFAState*> ConstructNFA();
+
+private:
+	std::vector<std::pair<char, char>> ranges_;
 };
 
 class ASTCharacter : public ASTNode
 {
 public:
-	char ch;
+	ASTCharacter(char ch);
+
+	virtual std::pair<NFAState*, NFAState*> ConstructNFA();
+
+private:
+	char ch_;
 };
 
 class ASTBackReference : public ASTNode
 {
 public: 
-	std::string  name;
+	ASTBackReference(int number);
+
+	virtual std::pair<NFAState*, NFAState*> ConstructNFA();
+
+private:
+	int number_; // 表示 \number 
 };
 
+enum class AnchorType { BEGIN, END, BOUND, NOT_BOUND };
 class ASTAnchor : public ASTNode
 {
 public:
-	enum AnchorType { BEGIN, END, BOUND, NOT_BOUND };
+	ASTAnchor(AnchorType type);
+
+	virtual std::pair<NFAState*, NFAState*> ConstructNFA();
+
+private:
 	AnchorType type_;
 };
 
 class ASTUnnameCapture : public ASTNode
 {
 public:
-	int number;	// 匿名捕获的标号
+	ASTUnnameCapture(ASTNode* node, int number);
+
+	virtual std::pair<NFAState*, NFAState*> ConstructNFA();
+
+private:
 	ASTNode*	node_;
+	int			number_;	// 匿名捕获的标号
 };
 
 class ASTNameCapture : public ASTNode
 {
 public:
-	std::string name;
+	ASTNameCapture(ASTNode* node, std::string name);
+
+	virtual std::pair<NFAState*, NFAState*> ConstructNFA();
+
+private:
 	ASTNode*	node_;
+	std::string name_;
 };
 
 // positive lookahead
 class ASTPstLookahead : public ASTNode
 {
 public:
+	ASTPstLookahead(ASTNode* node);
+
+	virtual std::pair<NFAState*, NFAState*> ConstructNFA();
+
+private:
 	ASTNode*	node_;
 };
 
@@ -88,6 +140,11 @@ public:
 class ASTNgtLookahead : public ASTNode
 {
 public:
+	ASTNgtLookahead(ASTNode* node);
+
+	virtual std::pair<NFAState*, NFAState*> ConstructNFA();
+
+private:
 	ASTNode*	node_;
 };
 

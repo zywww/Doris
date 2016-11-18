@@ -111,6 +111,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AST.cpp" />
+    <ClCompile Include="Automaton.cpp" />
     <ClCompile Include="DFA.cpp" />
     <ClCompile Include="Lexer.cpp" />
     <ClCompile Include="main.cpp" />
@@ -121,6 +122,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AST.h" />
+    <ClInclude Include="Automaton.h" />
     <ClInclude Include="DFA.h" />
     <ClInclude Include="Lexer.h" />
     <ClInclude Include="NFA.h" />

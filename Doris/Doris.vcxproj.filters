@@ -39,6 +39,9 @@
     <ClCompile Include="DFA.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Automaton.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Token.h">
@@ -60,6 +63,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="DFA.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Automaton.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

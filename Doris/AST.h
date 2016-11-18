@@ -4,6 +4,7 @@
 #include <tuple>
 #include <utility>
 #include <vector>
+#include <string>
 #include "DFA.h"	
 #include "NFA.h"
 
@@ -19,13 +20,13 @@ public:
 	virtual std::pair<NFAState*, NFAState*> ConstructNFA();
 
 private:
-	ASTNode*	left_;
-	ASTNode*	right_;
+	std::vector<ASTNode*> astvec;
 };
 
 class ASTCat : public ASTNode
 {
-
+private:
+	std::vector<ASTNode*> astvec;
 };
 
 class ASTRepeat : public ASTNode
@@ -37,13 +38,10 @@ public:
 	int			max_;
 };
 
-
-
 class ASTCharClass : public ASTNode
 {
 public:
-	char begin;
-	char end;
+	std::vector<std::pair<int, int>> ranges;
 };
 
 class ASTCharacter : public ASTNode
@@ -52,6 +50,46 @@ public:
 	char ch;
 };
 
+class ASTBackReference : public ASTNode
+{
+public: 
+	std::string  name;
+};
+
+class ASTAnchor : public ASTNode
+{
+public:
+	enum AnchorType { BEGIN, END, BOUND, NOT_BOUND };
+	AnchorType type_;
+};
+
+class ASTUnnameCapture : public ASTNode
+{
+public:
+	int number;	// 匿名捕获的标号
+	ASTNode*	node_;
+};
+
+class ASTNameCapture : public ASTNode
+{
+public:
+	std::string name;
+	ASTNode*	node_;
+};
+
+// positive lookahead
+class ASTPstLookahead : public ASTNode
+{
+public:
+	ASTNode*	node_;
+};
+
+// negative lookahead
+class ASTNgtLookahead : public ASTNode
+{
+public:
+	ASTNode*	node_;
+};
 
 
 

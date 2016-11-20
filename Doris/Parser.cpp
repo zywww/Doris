@@ -45,8 +45,26 @@ ASTNode* Parser::Regex()
 	if (Match(TokenType::END))
 		return nullptr;
 
-	ASTOR* node = new ASTOR;
+	ASTOR* root = new ASTOR;
+	root->Push(Term());
+	while (Match(TokenType::OR))
+	{
+		GetNextToken();
+		root->Push(Term());
+	}
 	
+	if (Match(TokenType::END))
+		return root;
+	else
+	{
+		Error("'|' È±ÉÙÒò×Ó");
+		return nullptr;
+	}
+}
+
+ASTNode* Parser::Term()
+{
+
 }
 
 

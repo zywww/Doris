@@ -7,6 +7,7 @@
 enum class TokenType
 {
 	SIMPLECHAR,		// 即用来匹配的ASCII字符
+	NUMBER,			// {min, max} 中的数字
 //	WIDECHAR,		// 宽字符
 
 	OR,				// |

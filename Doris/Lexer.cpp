@@ -14,7 +14,7 @@ using std::pair;
 enum class State
 {
 	START,
-	BACKSLASH,
+	BACKSLASH
 };
 
 Lexer::Lexer(const string &regex) : regex_(regex)
@@ -104,6 +104,7 @@ void Lexer::Analyze()
 			default: push(TokenType::SIMPLECHAR, ch); break;
 			}
 			break;
+
 		case State::BACKSLASH:
 			switch (ch)
 			{
@@ -139,6 +140,7 @@ void Lexer::Analyze()
 					push(TokenType::SIMPLECHAR, ch);
 				break;
 			}
+			break;
 		}
 	}
 	if (state == State::BACKSLASH)
@@ -215,4 +217,15 @@ char* Lexer::DivideCharSet()
 
 	}
 	*/
+}
+
+int Lexer::Number(string::size_type index)
+{
+	long long ans = 0;
+	while (index < regex_.size() && regex_[index] > '0' && regex_[index] < '9')
+	{
+		ans = ans * 10 + regex_[index++] - '0';
+		if (ans > INT_MAX) Error("Êý×ÖÒç³ö"); 
+	}
+	return ans;
 }

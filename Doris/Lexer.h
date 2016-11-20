@@ -26,6 +26,8 @@ private:
 	bool							isDFA();
 	// 分析一遍词法单元，确定字符集
 	char*							DivideCharSet();	// 在 regex 类的析构函数中回收该空间
+	// 词法分析数字 TODO 判断是否溢出
+	int								Number(std::string::size_type index);			
 		
 	const std::string&				regex_;
 	std::vector<Token>				stream_;

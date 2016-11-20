@@ -22,7 +22,7 @@ public:
 	ASTOR();
 
 	void Push(ASTNode* node);
-	virtual std::pair<NFAState*, NFAState*> ConstructNFA();
+	//virtual std::pair<NFAState*, NFAState*> ConstructNFA();
 
 private:
 	std::vector<ASTNode*> nodeVec_;
@@ -34,7 +34,7 @@ public:
 	ASTCat();
 
 	void Push(ASTNode* node);
-	virtual std::pair<NFAState*, NFAState*> ConstructNFA();
+	//virtual std::pair<NFAState*, NFAState*> ConstructNFA();
 
 private:
 	std::vector<ASTNode*> nodeVec_;
@@ -45,7 +45,7 @@ class ASTRepeat : public ASTNode
 public:
 	ASTRepeat(ASTNode* node, bool greedy, int min, int max);
 
-	virtual std::pair<NFAState*, NFAState*> ConstructNFA();
+	//virtual std::pair<NFAState*, NFAState*> ConstructNFA();
 
 private:
 	ASTNode*	node_;
@@ -60,7 +60,7 @@ public:
 	ASTCharClass();
 
 	void Push(std::pair<char, char> range);
-	virtual std::pair<NFAState*, NFAState*> ConstructNFA();
+	//virtual std::pair<NFAState*, NFAState*> ConstructNFA();
 
 private:
 	std::vector<std::pair<char, char>> ranges_;
@@ -71,7 +71,7 @@ class ASTCharacter : public ASTNode
 public:
 	ASTCharacter(char ch);
 
-	virtual std::pair<NFAState*, NFAState*> ConstructNFA();
+	//virtual std::pair<NFAState*, NFAState*> ConstructNFA();
 
 private:
 	char ch_;
@@ -82,7 +82,7 @@ class ASTBackReference : public ASTNode
 public: 
 	ASTBackReference(int number);
 
-	virtual std::pair<NFAState*, NFAState*> ConstructNFA();
+	//virtual std::pair<NFAState*, NFAState*> ConstructNFA();
 
 private:
 	int number_; // ±Ì æ \number 
@@ -94,7 +94,7 @@ class ASTAnchor : public ASTNode
 public:
 	ASTAnchor(AnchorType type);
 
-	virtual std::pair<NFAState*, NFAState*> ConstructNFA();
+	//virtual std::pair<NFAState*, NFAState*> ConstructNFA();
 
 private:
 	AnchorType type_;
@@ -105,7 +105,7 @@ class ASTUnnameCapture : public ASTNode
 public:
 	ASTUnnameCapture(ASTNode* node, int number);
 
-	virtual std::pair<NFAState*, NFAState*> ConstructNFA();
+	//virtual std::pair<NFAState*, NFAState*> ConstructNFA();
 
 private:
 	ASTNode*	node_;
@@ -117,7 +117,7 @@ class ASTNameCapture : public ASTNode
 public:
 	ASTNameCapture(ASTNode* node, std::string name);
 
-	virtual std::pair<NFAState*, NFAState*> ConstructNFA();
+	//virtual std::pair<NFAState*, NFAState*> ConstructNFA();
 
 private:
 	ASTNode*	node_;
@@ -130,7 +130,7 @@ class ASTPstLookahead : public ASTNode
 public:
 	ASTPstLookahead(ASTNode* node);
 
-	virtual std::pair<NFAState*, NFAState*> ConstructNFA();
+	//virtual std::pair<NFAState*, NFAState*> ConstructNFA();
 
 private:
 	ASTNode*	node_;
@@ -142,7 +142,7 @@ class ASTNgtLookahead : public ASTNode
 public:
 	ASTNgtLookahead(ASTNode* node);
 
-	virtual std::pair<NFAState*, NFAState*> ConstructNFA();
+	//virtual std::pair<NFAState*, NFAState*> ConstructNFA();
 
 private:
 	ASTNode*	node_;

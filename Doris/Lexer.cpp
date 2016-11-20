@@ -32,6 +32,14 @@ Token Lexer::GetNextToken()
 		return Token(TokenType::END);
 }
 
+Token Lexer::Lookahead()
+{
+	if (tokenIndex_ + 1 < stream_.size())
+		return stream_[tokenIndex_ + 1];
+	else
+		return Token(TokenType::END);
+}
+
 bool Lexer::GetIsDFA()
 {
 	return canGenDFA_;

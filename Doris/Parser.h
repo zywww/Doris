@@ -18,9 +18,11 @@ private:
 	void						GetNextToken();		// 通过 lexer_ 获取下个词法单元
 	// 查看下一个词法单元是否匹配，但指针不前进
 	bool						Lookahead(Token token);
-	// 查看下一个词法单元是否匹配，若不匹配则出错，若匹配则获取下一个词法单元
+	// 查看下一个词法单元是否匹配
 	bool						Match(char ch);
 	bool						Match(TokenType type);
+	bool						MatchAndGoahead(char ch);
+	bool						MatchAndGoahead(TokenType type);
 
 	// 递归下降的语法分析
 	ASTNode*					Regex();

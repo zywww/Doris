@@ -50,4 +50,9 @@ struct Token
 								// 还有 \number 的反向引用，将 number 存在 lexeme
 };
 
+bool operator==(const Token &lhs, const Token &rhs)
+{
+	return lhs.type_ == rhs.type_ && lhs.lexeme_ == rhs.lexeme_;
+}
+
 #endif

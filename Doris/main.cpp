@@ -44,7 +44,9 @@ void testLexer()
 	Lexer lex26(string("a(?=ad)"));
 	Lexer lex27(string("a(?!ad)"));
 	Lexer lex28(string("-\\-"));
-
+	Lexer lex29(string(""));
+	auto temp1 = lex29.GetNextToken();
+	cout << (temp.type_ == TokenType::END) << endl;
 	cout << "ÏÂ¶Ïµã" << endl;
 }
 

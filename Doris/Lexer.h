@@ -12,6 +12,7 @@ public:
 
 	// 如果 tokenStream 到达末尾，返回 END
 	Token							GetNextToken();	
+	Token							Lookahead();
 	// 该正则表达式是否可以生成 DFA
 	bool							GetIsDFA();
 	

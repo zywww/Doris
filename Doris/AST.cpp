@@ -4,12 +4,16 @@
 
 using std::string;
 using std::pair;
-
+using std::make_pair;
 
 ASTNode::ASTNode()
 {
 }
 
+pair<NFAState*, NFAState*> ASTNode::ConstructNFA()
+{
+	return make_pair(nullptr, nullptr);
+}
 
 
 ASTOR::ASTOR()

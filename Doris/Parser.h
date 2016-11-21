@@ -33,7 +33,6 @@ private:
 	std::pair<ASTNode*, bool>	Atom();
 	std::tuple<bool, int, int>	Repeat();			// 返回重复的次数 min, max 和 是否贪婪重复
 	ASTNode*					Charclass();
-	ASTNode*					GroupConstruct();
 	ASTNode*					UnnameCapture();
 	ASTNode*					NameCapture();
 	ASTNode*					NotCapture();
@@ -47,6 +46,7 @@ private:
 	const std::string&	regex_;
 	Lexer				lexer_;
 	Token				token_;
+	int					count_ = 0;
 };
 
 #endif 

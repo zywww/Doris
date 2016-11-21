@@ -1,5 +1,6 @@
 #include <iostream>
 #include <tuple>	
+#include <cctype>	
 #include "Parser.h"
 
 using std::cout;
@@ -50,10 +51,9 @@ bool Parser::Match(TokenType type)
 
 ASTNode* Parser::Regex()
 {
-	if (Match(TokenType::END))
-		return nullptr;
-
 	ASTOR* root = new ASTOR;
+	if (Match(TokenType::END))
+		return root;
 	root->Push(Term());
 	while (Match(TokenType::OR))
 	{
@@ -299,9 +299,59 @@ ASTNode* Parser::Charclass()
 	return node;
 }
 
-ASTNode* UnnameCapture()
+ASTNode* Parser::UnnameCapture()
 {
+	ASTNode* node = new ASTUnnameCapture(Regex(), count_++);
+	if (!Match(TokenType::RP))
+		Error("缺少 )");
+	GetNextToken();
+	return node;
+}
 
+// 进入该函数时以确定有 (?:
+ASTNode* Parser::NotCapture()
+{
+	GetNextToken();
+	ASTNode* node = Regex();
+	if (!Match(TokenType::RP))
+		Error("缺少 )");
+	GetNextToken();
+	return node;
+}
+
+// 进入该函数以确定有 (?<
+ASTNode* Parser::NameCapture()
+{
+	GetNextToken();
+	std::string name = Name(); // Name 遇到 > 就退出
+	GetNextToken();
+	ASTNode* node = Regex();
+	if (!Match(TokenType::RP))
+		Error("缺少 )");
+	GetNextToken();
+	return new ASTNameCapture(node, name);
+}
+
+// 进入该函数以确定 (?= 开头
+ASTNode* Parser::PositiveLookahead()
+{
+	GetNextToken();
+	ASTNode* node = Regex();
+	if (!Match(TokenType::RP))
+		Error("缺少 )");
+	GetNextToken();
+	return new ASTPstLookahead(node);
+}
+
+// 进入该函数以确定 (?! 开头
+ASTNode* Parser::NegativeLookahead()
+{
+	GetNextToken();
+	ASTNode* node = Regex();
+	if (!Match(TokenType::RP))
+		Error("缺少 )");
+	GetNextToken();
+	return new ASTNgtLookahead(node);
 }
 
 // 调用 Number 时，确定已经有一位数字
@@ -320,6 +370,21 @@ int Parser::Number()
 
 string Parser::Name()
 {
-
+	string ans;
+	if (std::isdigit(token_.lexeme_))
+		Error("名称不能以数字开头");
+	while (!Match(TokenType::RANGLE))
+	{
+		if (!Match(TokenType::SIMPLECHAR))
+			Error("<> 内结构错误");
+		else if (std::isalnum(token_.lexeme_) || token_.lexeme_ == '_')
+			ans += token_.lexeme_;
+		else
+			Error("<> 内的名称应该为合法的标识符");
+		GetNextToken();
+	}
+	if (ans.empty())
+		Error("命名不能为空");
+	return ans;
 }
 

@@ -22,6 +22,8 @@ enum class TokenType
 	RBRACKET,		// ]
 	LP,				// (   
 	RP,				// )
+	LANGLE,			// <
+	RANGLE,			// >
 	BACKSLASH,		// \ 反斜杠
 	MINUS,			// - 连字符	若在 [] 外，则 MINUS 和 simplechar 的 '-' 是同语义的
 

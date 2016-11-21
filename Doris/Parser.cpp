@@ -1,10 +1,12 @@
 #include <iostream>
+#include <tuple>	
 #include "Parser.h"
 
 using std::cout;
 using std::endl;
 using std::string;
 using std::get;
+using std::pair;
 
 Parser::Parser(const string &regex) : 
 	regex_(regex), lexer_(regex), token_(TokenType::END)
@@ -34,6 +36,11 @@ bool Parser::Lookahead(Token token)
 {
 	auto temp = lexer_.Lookahead();
 	return token == temp;
+}
+
+bool Parser::Match(char ch)
+{
+	return token_.type_ == TokenType::SIMPLECHAR && token_.lexeme_ == ch;
 }
 
 bool Parser::Match(TokenType type)
@@ -105,6 +112,93 @@ ASTNode* Parser::Factor()
 	}
 }
 
+pair<ASTNode*, bool> Parser::Atom()
+{
+	ASTNode* node = nullptr;
+	bool repeat = true;
+	switch (token_.type_)
+	{
+	case TokenType::SIMPLECHAR:
+		node = new ASTCharacter(token_.lexeme_);
+		GetNextToken();
+		break;
+		
+	case TokenType::NEGATE: 
+		node = new ASTAnchor(AnchorType::BEGIN);
+		repeat = false;
+		GetNextToken();
+		break;
+
+	case TokenType::DOLLAR:
+		node = new ASTAnchor(AnchorType::END);
+		repeat = false;
+		GetNextToken();
+		break;
+
+	case TokenType::BOUND:
+		node = new ASTAnchor(AnchorType::BOUND);
+		repeat = false;
+		GetNextToken();
+		break;
+
+	case TokenType::NOT_BOUND:
+		node = new ASTAnchor(AnchorType::NOT_BOUND);
+		repeat = false;
+		GetNextToken();
+		break;
+
+	case TokenType::BACKREF:
+		node = new ASTBackReference(token_.lexeme_ - '0');
+		GetNextToken();
+		break;
+
+	case TokenType::NAMEREF:
+		if (Match(TokenType::LANGLE))
+		{
+			string name;
+			GetNextToken();
+			name = Name();
+			// Name() 遇到 > 才返回来，因此不需要检查
+			GetNextToken();
+			node = new ASTNameReference(name);
+		}
+		else
+			Error("命名引用成分缺少");
+		break;
+
+	case TokenType::LBRACKET:
+		GetNextToken();
+		node = Charclass();
+		break;
+
+	case TokenType::LP:
+		GetNextToken();
+		if (Match(TokenType::QUERY))
+		{
+			GetNextToken();
+			if (Match(':'))
+				node = NotCapture();
+			else if (Match(TokenType::LANGLE))
+				node = NameCapture();
+			else if (Match('='))
+			{
+				node = PositiveLookahead();
+				repeat = false;
+			}
+			else if (Match('!'))
+			{
+				node = NegativeLookahead();
+				repeat = false;
+			}
+			else
+				Error("(? 非法");
+		}
+		else
+			node = UnnameCapture();
+	}
+	return std::make_pair(node, repeat);
+}
+
 // 能进入 Repeat 的分析，说明该构造是 * + ? { 等符号开始的
 std::tuple<bool, int, int>	Parser::Repeat()
 {
@@ -146,9 +240,86 @@ std::tuple<bool, int, int>	Parser::Repeat()
 
 	case TokenType::LBRACE:
 		GetNextToken();
-
+		if (token_.lexeme_ > '0' && token_.lexeme_ < '9')
+			min = Number();
+		else
+			Error("{ } 内缺少数字");
+		if (Match(','))
+		{
+			GetNextToken();
+			if (Match(TokenType::RBRACE))
+				max = -1;
+			else if (token_.lexeme_ > '0' && token_.lexeme_ < '9')
+				max = Number();
+			else
+				Error(" , 成分错误");
+		}
+		else if (Match(TokenType::RBRACE))
+			max = -1;
+		else
+			Error("{ } 成分错误");
+		if (Match(TokenType::QUERY))
+		{
+			greedy = true;
+			GetNextToken();
+		}
 	}
+	return	std::make_tuple(greedy, min, max);
 }
 
+ASTNode* Parser::Charclass()
+{
+	ASTCharClass* node;
+	if (Match(TokenType::NEGATE))
+	{
+		node = new ASTCharClass(true);
+		GetNextToken();
+	}
+	else
+		node = new ASTCharClass(false);
+	while (!Match(TokenType::RBRACKET))
+	{
+		if (Match(TokenType::END)) Error("[ ] 构造错误");
+		char lhs = token_.lexeme_;
+		GetNextToken();
+		if (Match(TokenType::MINUS))
+		{
+			GetNextToken();
+			if (!Match(TokenType::SIMPLECHAR) || token_.lexeme_ < lhs)
+				Error("[ ] 构造错误");
+			else
+			{
+				node->Push(std::make_pair(lhs, token_.lexeme_));
+				GetNextToken();
+			}
+		}
+		else
+			node->Push(std::make_pair(lhs, lhs));
+	}
+	return node;
+}
 
+ASTNode* UnnameCapture()
+{
+
+}
+
+// 调用 Number 时，确定已经有一位数字
+int Parser::Number()
+{
+	long long ans = 0;
+	while (token_.lexeme_ > '0' && token_.lexeme_ < '9')
+	{
+		ans = ans * 10 + (token_.lexeme_ - '0');
+		if (ans > INT_MAX)
+			Error("数字溢出");
+		GetNextToken();
+	}
+	return ans;
+}
+
+string Parser::Name()
+{
+
+}
 

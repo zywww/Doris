@@ -57,13 +57,14 @@ private:
 class ASTCharClass : public ASTNode
 {
 public:
-	ASTCharClass();
+	ASTCharClass(bool negate);
 
 	void Push(std::pair<char, char> range);
 	//virtual std::pair<NFAState*, NFAState*> ConstructNFA();
 
 private:
 	std::vector<std::pair<char, char>> ranges_;
+	bool negate_;
 };
 
 class ASTCharacter : public ASTNode
@@ -86,6 +87,15 @@ public:
 
 private:
 	int number_; // ±Ì æ \number 
+};
+
+class ASTNameReference : public ASTNode
+{
+public:
+	ASTNameReference(std::string name);
+
+private:
+	std::string name_;
 };
 
 enum class AnchorType { BEGIN, END, BOUND, NOT_BOUND };

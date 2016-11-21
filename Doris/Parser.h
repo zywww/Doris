@@ -1,6 +1,7 @@
 #ifndef DORIS_PARSER_H__
 #define DORIS_PARSER_H__
 
+#include <tuple>	
 #include <string>
 #include "Lexer.h"
 #include "AST.h"
@@ -18,8 +19,9 @@ private:
 	void						GetNextToken();		// 通过 lexer_ 获取下个词法单元
 	// 查看下一个词法单元是否匹配，但指针不前进
 	bool						Lookahead(Token token);
-	// 查看下一个词法单元是否匹配
+	// 检查当前词法单元是否是简单字符 ch
 	bool						Match(char ch);
+	// 检查当前词法单元是否是某一元字符
 	bool						Match(TokenType type);
 	bool						MatchAndGoahead(char ch);
 	bool						MatchAndGoahead(TokenType type);
@@ -37,6 +39,9 @@ private:
 	ASTNode*					NotCapture();
 	ASTNode*					PositiveLookahead();
 	ASTNode*					NegativeLookahead();
+
+	int							Number();
+	std::string					Name();
 	
 
 	const std::string&	regex_;

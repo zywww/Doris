@@ -44,7 +44,8 @@ ASTRepeat::ASTRepeat(ASTNode* node, bool greedy, int min, int max) :
 
 
 
-ASTCharClass::ASTCharClass()
+ASTCharClass::ASTCharClass(bool negate) : 
+	negate_(negate)
 {
 }
 
@@ -64,6 +65,13 @@ ASTCharacter::ASTCharacter(char ch) :
 
 ASTBackReference::ASTBackReference(int number) : 
 	number_(number)
+{
+}
+
+
+
+ASTNameReference::ASTNameReference(string name) :
+	name_(name)
 {
 }
 

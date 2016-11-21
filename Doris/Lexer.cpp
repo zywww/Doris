@@ -99,6 +99,8 @@ void Lexer::Analyze()
 			case ']': push(TokenType::RBRACKET); break;
 			case '(': push(TokenType::LP); break;
 			case ')': push(TokenType::RP); break;
+			case '<': push(TokenType::LANGLE); break;
+			case '>': push(TokenType::RANGLE); break;
 			case '-': push(TokenType::MINUS); break;
 			case '\\': state = State::BACKSLASH; ++index; break;
 			default: push(TokenType::SIMPLECHAR, ch); break;
@@ -135,7 +137,7 @@ void Lexer::Analyze()
 				break;
 			default: 
 				if (ch >= '1' && ch <= '9')
-					push(TokenType::BACKREF, ch);
+					push(TokenType::BACKREF, ch);	// ±£´æÎªÊý×Ö×Ö·û
 				else
 					push(TokenType::SIMPLECHAR, ch);
 				break;

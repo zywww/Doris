@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <string>
 #include "Lexer.h"
+#include "Parser.h"
 
 using std::string;
 using std::endl;
@@ -48,9 +49,18 @@ void testLexer()
 	cout << "下断点" << endl;
 }
 
+void testParser()
+{
+	Parser ps1(string(""));
+
+
+	cout << "下断点" << endl;
+}
+
 void test()
 {
-	testLexer();
+	//testLexer();
+	testParser();
 }
 
 int main()

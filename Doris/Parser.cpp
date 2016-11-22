@@ -13,6 +13,7 @@ Parser::Parser(const string &regex) :
 	regex_(regex), lexer_(regex), token_(TokenType::END)
 {
 	GetNextToken();
+	root_ = Parse();
 }
 
 ASTNode* Parser::Parse()

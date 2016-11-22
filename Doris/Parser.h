@@ -46,6 +46,7 @@ private:
 	const std::string&	regex_;
 	Lexer				lexer_;
 	Token				token_;
+	ASTNode*			root_ = nullptr;
 	int					count_ = 0;
 };
 

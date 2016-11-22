@@ -102,6 +102,7 @@ void Lexer::Analyze()
 			case '<': push(TokenType::LANGLE); break;
 			case '>': push(TokenType::RANGLE); break;
 			case '-': push(TokenType::MINUS); break;
+			case '.': push(TokenType::ANY); break;
 			case '\\': state = State::BACKSLASH; ++index; break;
 			default: push(TokenType::SIMPLECHAR, ch); break;
 			}

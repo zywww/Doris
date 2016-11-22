@@ -52,6 +52,24 @@ void testLexer()
 void testParser()
 {
 	Parser ps1(string(""));
+	Parser ps9(string("a||a"));
+	Parser ps2(string("()"));
+	Parser ps3(string("a|b"));
+	Parser ps4(string("ab|cddd|efg"));
+	Parser ps5(string("a* "));
+	Parser ps6(string("a*b+c?"));
+	Parser ps7(string("d{3}"));
+	Parser ps8(string("e{4,}f{5,6}"));
+	Parser ps10("a*?b+?c??d{3}?e{4,}?f{5,6}?");
+	Parser ps11("[abc]");
+	Parser ps12("[^abc]");
+	Parser ps13("[abc]{3,5}");
+	//Parser ps14("^*");
+	//Parser ps15("e{3,2}");
+	//Parser ps16("a{2147483647,2147483648}");
+	Parser ps15(string("^$\\b\\B	"));
+	Parser ps16(string("\\3"));
+	Parser ps17("\\k<name>");
 
 
 	cout << "ÏÂ¶Ïµã" << endl;

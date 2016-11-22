@@ -18,7 +18,10 @@ Parser::Parser(const string &regex) :
 
 ASTNode* Parser::Parse()
 {
-	return Regex();
+	ASTNode* root = Regex();
+	if (!Match(TokenType::END))
+		Error("表达式错误");
+	return root;
 }
 
 bool Parser::isDFA() { return lexer_.GetIsDFA(); }
@@ -34,12 +37,6 @@ void Parser::GetNextToken()
 	token_ = lexer_.GetNextToken();
 }
 
-bool Parser::Lookahead(Token token)
-{
-	auto temp = lexer_.Lookahead();
-	return token == temp;
-}
-
 bool Parser::Match(char ch)
 {
 	return token_.type_ == TokenType::SIMPLECHAR && token_.lexeme_ == ch;
@@ -52,36 +49,21 @@ bool Parser::Match(TokenType type)
 
 ASTNode* Parser::Regex()
 {
-	ASTOR* root = new ASTOR;
-	if (Match(TokenType::END))
-		return root;
-	root->Push(Term());
+	ASTOR* node = new ASTOR;
+	node->Push(Term());
 	while (Match(TokenType::OR))
 	{
 		GetNextToken();
-		root->Push(Term());
+		node->Push(Term());
 	}
-	
-	if (Match(TokenType::END))
-		return root;
-	else
-	{
-		Error(" | 缺少因子");
-		return nullptr;
-	}
+	return node;
 }
 
 ASTNode* Parser::Term()
 {
-	if (Match(TokenType::OR))
-	{
-		Error(" | 缺少因子");
-		return nullptr;
-	}
-
 	ASTCat* node = new ASTCat;
 	node->Push(Factor());
-	while (!Match(TokenType::OR))
+	while (!Match(TokenType::OR) && !Match(TokenType::END))
 		node->Push(Factor());
 	return node;
 }
@@ -116,12 +98,19 @@ ASTNode* Parser::Factor()
 pair<ASTNode*, bool> Parser::Atom()
 {
 	ASTNode* node = nullptr;
+	ASTCharClass* temp = nullptr;
 	bool repeat = true;
 	switch (token_.type_)
 	{
 	case TokenType::SIMPLECHAR:
 		node = new ASTCharacter(token_.lexeme_);
 		GetNextToken();
+		break;
+
+	case TokenType::ANY:
+		temp = new ASTCharClass(true);
+		temp->Push(std::make_pair('\n', '\n'));
+		node = temp;
 		break;
 		
 	case TokenType::NEGATE: 
@@ -154,6 +143,7 @@ pair<ASTNode*, bool> Parser::Atom()
 		break;
 
 	case TokenType::NAMEREF:
+		GetNextToken();
 		if (Match(TokenType::LANGLE))
 		{
 			string name;
@@ -178,16 +168,24 @@ pair<ASTNode*, bool> Parser::Atom()
 		{
 			GetNextToken();
 			if (Match(':'))
+			{
+				GetNextToken();
 				node = NotCapture();
+			}
 			else if (Match(TokenType::LANGLE))
+			{
+				GetNextToken();
 				node = NameCapture();
+			}
 			else if (Match('='))
 			{
+				GetNextToken();
 				node = PositiveLookahead();
 				repeat = false;
 			}
 			else if (Match('!'))
 			{
+				GetNextToken();
 				node = NegativeLookahead();
 				repeat = false;
 			}
@@ -196,6 +194,11 @@ pair<ASTNode*, bool> Parser::Atom()
 		}
 		else
 			node = UnnameCapture();
+		break;
+	default:
+		node = new ASTEmpty();
+		repeat = false;
+		break;
 	}
 	return std::make_pair(node, repeat);
 }
@@ -232,6 +235,7 @@ std::tuple<bool, int, int>	Parser::Repeat()
 	case TokenType::QUERY:
 		min = 0;
 		max = 1;
+		GetNextToken();
 		if (Match(TokenType::QUERY))
 		{
 			greedy = false;
@@ -241,27 +245,42 @@ std::tuple<bool, int, int>	Parser::Repeat()
 
 	case TokenType::LBRACE:
 		GetNextToken();
-		if (token_.lexeme_ > '0' && token_.lexeme_ < '9')
+		if (std::isdigit(token_.lexeme_))
 			min = Number();
 		else
 			Error("{ } 内缺少数字");
+
 		if (Match(','))
 		{
 			GetNextToken();
 			if (Match(TokenType::RBRACE))
+			{
 				max = -1;
-			else if (token_.lexeme_ > '0' && token_.lexeme_ < '9')
+				GetNextToken();
+			}
+			else if (std::isdigit(token_.lexeme_))
+			{
 				max = Number();
+				if (!Match(TokenType::RBRACE))
+					Error("缺少 }");
+				if (min > max)
+					Error("{ } 内 max 必须大于等于 min");
+				GetNextToken();
+			}
 			else
-				Error(" , 成分错误");
+				Error("{ } 成分错误");
 		}
 		else if (Match(TokenType::RBRACE))
-			max = -1;
+		{
+			max = min;
+			GetNextToken();
+		}
 		else
 			Error("{ } 成分错误");
+
 		if (Match(TokenType::QUERY))
 		{
-			greedy = true;
+			greedy = false;
 			GetNextToken();
 		}
 	}
@@ -297,11 +316,21 @@ ASTNode* Parser::Charclass()
 		else
 			node->Push(std::make_pair(lhs, lhs));
 	}
+	GetNextToken();
 	return node;
 }
 
+// 进入该函数以确定 ( 开头
 ASTNode* Parser::UnnameCapture()
 {
+	// 当 () 内为空时
+	if (Match(TokenType::RP))
+	{
+		GetNextToken();
+		return new ASTUnnameCapture(new ASTEmpty(), count_++);
+	}
+
+	// 当 () 内不为空
 	ASTNode* node = new ASTUnnameCapture(Regex(), count_++);
 	if (!Match(TokenType::RP))
 		Error("缺少 )");
@@ -312,7 +341,14 @@ ASTNode* Parser::UnnameCapture()
 // 进入该函数时以确定有 (?:
 ASTNode* Parser::NotCapture()
 {
-	GetNextToken();
+	// 当 (?:) 内为空时
+	if (Match(TokenType::RP))
+	{
+		GetNextToken();
+		return new ASTEmpty();
+	}
+	
+	// 当 (?:) 内不为空
 	ASTNode* node = Regex();
 	if (!Match(TokenType::RP))
 		Error("缺少 )");
@@ -323,9 +359,17 @@ ASTNode* Parser::NotCapture()
 // 进入该函数以确定有 (?<
 ASTNode* Parser::NameCapture()
 {
-	GetNextToken();
 	std::string name = Name(); // Name 遇到 > 就退出
 	GetNextToken();
+
+	// 当 (?<name>) 内为空时
+	if (Match(TokenType::RP))
+	{
+		GetNextToken();
+		return new ASTNameCapture(new ASTEmpty(), name);
+	}
+
+	// 当 (?<name>) 内不为空时
 	ASTNode* node = Regex();
 	if (!Match(TokenType::RP))
 		Error("缺少 )");
@@ -336,7 +380,15 @@ ASTNode* Parser::NameCapture()
 // 进入该函数以确定 (?= 开头
 ASTNode* Parser::PositiveLookahead()
 {
-	GetNextToken();
+	// 当 (?=) 为空时，该边一定通过
+	if (Match(TokenType::RP))
+	{
+		//GetNextToken();
+		//return new ASTEmpty();
+		Error("预查子表达式不能为空");
+	}
+
+	// 当 (?=) 不为空时
 	ASTNode* node = Regex();
 	if (!Match(TokenType::RP))
 		Error("缺少 )");
@@ -347,7 +399,11 @@ ASTNode* Parser::PositiveLookahead()
 // 进入该函数以确定 (?! 开头
 ASTNode* Parser::NegativeLookahead()
 {
-	GetNextToken();
+	// 当 (?!) 内为空时
+	if (Match(TokenType::RP))
+		Error("预查子表达式不能为空");
+
+	// 当 (?!) 不为空时
 	ASTNode* node = Regex();
 	if (!Match(TokenType::RP))
 		Error("缺少 )");
@@ -359,7 +415,7 @@ ASTNode* Parser::NegativeLookahead()
 int Parser::Number()
 {
 	long long ans = 0;
-	while (token_.lexeme_ > '0' && token_.lexeme_ < '9')
+	while (std::isdigit(token_.lexeme_))
 	{
 		ans = ans * 10 + (token_.lexeme_ - '0');
 		if (ans > INT_MAX)

@@ -11,20 +11,20 @@ class Parser
 public:
 	Parser(const std::string &regex);
 
-	ASTNode*					Parse();			// 对正则表达式进行语法分析，若错误则中断，若成功则返回 AST 根结点
+	// 对正则表达式进行语法分析，若成功则返回 AST 根结点
+	ASTNode*					Parse();			
 	bool						isDFA();
 
 private:
-	void						Error(const std::string &info);			// 语法错误
-	void						GetNextToken();		// 通过 lexer_ 获取下个词法单元
-	// 查看下一个词法单元是否匹配，但指针不前进
-	bool						Lookahead(Token token);
-	// 检查当前词法单元是否是简单字符 ch
+	// 语法错误
+	void						Error(const std::string &info);			
+	// 通过 lexer_ 获取下个词法单元
+	void						GetNextToken();		
+	
+	// 检查当前词法单元是否是 简单字符 ch
 	bool						Match(char ch);
-	// 检查当前词法单元是否是某一元字符
+	// 检查当前词法单元是否是 某类型元字符
 	bool						Match(TokenType type);
-	bool						MatchAndGoahead(char ch);
-	bool						MatchAndGoahead(TokenType type);
 
 	// 递归下降的语法分析
 	ASTNode*					Regex();
@@ -38,7 +38,6 @@ private:
 	ASTNode*					NotCapture();
 	ASTNode*					PositiveLookahead();
 	ASTNode*					NegativeLookahead();
-
 	int							Number();
 	std::string					Name();
 	
@@ -47,7 +46,7 @@ private:
 	Lexer				lexer_;
 	Token				token_;
 	ASTNode*			root_ = nullptr;
-	int					count_ = 0;
+	int					count_ = 1;
 };
 
 #endif 

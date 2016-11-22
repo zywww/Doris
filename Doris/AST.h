@@ -67,6 +67,12 @@ private:
 	bool negate_;
 };
 
+class ASTEmpty : public ASTNode
+{
+public:
+	ASTEmpty() = default;
+};
+
 class ASTCharacter : public ASTNode
 {
 public:

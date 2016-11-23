@@ -68,9 +68,13 @@ void testParser()
 	//Parser ps15("e{3,2}");
 	//Parser ps16("a{2147483647,2147483648}");
 	Parser ps15(string("^$\\b\\B	"));
-	Parser ps16(string("\\3"));
-	Parser ps17("\\k<name>");
-
+	Parser ps16(string("\\3+"));
+	Parser ps17("\\k<name>*");
+	//Parser ps18("[ca-b^de-f]*");
+	Parser ps19("[ca-bde-f]*");
+	Parser ps22("(re)");
+	//Parser ps20("(reg(ex))");
+	//Parser ps21("(reg(ex)");
 
 	cout << "ÏÂ¶Ïµã" << endl;
 }

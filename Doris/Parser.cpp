@@ -18,6 +18,8 @@ Parser::Parser(const string &regex) :
 
 ASTNode* Parser::Parse()
 {
+	if (Match(TokenType::END))
+		return new ASTEmpty();
 	ASTNode* root = Regex();
 	if (!Match(TokenType::END))
 		Error("表达式错误");
@@ -50,7 +52,11 @@ bool Parser::Match(TokenType type)
 ASTNode* Parser::Regex()
 {
 	ASTOR* node = new ASTOR;
-	node->Push(Term());
+	if (Match(TokenType::OR))
+		node->Push(new ASTEmpty());
+	else 
+		node->Push(Term());
+	
 	while (Match(TokenType::OR))
 	{
 		GetNextToken();
@@ -63,6 +69,7 @@ ASTNode* Parser::Term()
 {
 	ASTCat* node = new ASTCat;
 	node->Push(Factor());
+
 	while (!Match(TokenType::OR) && !Match(TokenType::END))
 		node->Push(Factor());
 	return node;
@@ -195,9 +202,12 @@ pair<ASTNode*, bool> Parser::Atom()
 		else
 			node = UnnameCapture();
 		break;
-	default:
+	default: // 改成错误？？
+		/*
 		node = new ASTEmpty();
-		repeat = false;
+		repeat = true;
+		*/
+		Error("表达式错误");
 		break;
 	}
 	return std::make_pair(node, repeat);
@@ -300,13 +310,17 @@ ASTNode* Parser::Charclass()
 	while (!Match(TokenType::RBRACKET))
 	{
 		if (Match(TokenType::END)) Error("[ ] 构造错误");
+		if (!Match(TokenType::SIMPLECHAR))
+			Error("[ ] 内元字符使用错误");
 		char lhs = token_.lexeme_;
 		GetNextToken();
 		if (Match(TokenType::MINUS))
 		{
 			GetNextToken();
-			if (!Match(TokenType::SIMPLECHAR) || token_.lexeme_ < lhs)
-				Error("[ ] 构造错误");
+			if (!Match(TokenType::SIMPLECHAR))
+				Error("[ ] 内元字符使用错误");
+			else if (token_.lexeme_ < lhs)
+				Error("[ ] 内字符范围错误");
 			else
 			{
 				node->Push(std::make_pair(lhs, token_.lexeme_));

@@ -60,8 +60,12 @@ ASTNode* Parser::Regex()
 	while (Match(TokenType::OR))
 	{
 		GetNextToken();
-		node->Push(Term());
+		if (Match(TokenType::OR))
+			node->Push(new ASTEmpty());
+		else 
+			node->Push(Term());
 	}
+	
 	return node;
 }
 
@@ -70,7 +74,7 @@ ASTNode* Parser::Term()
 	ASTCat* node = new ASTCat;
 	node->Push(Factor());
 
-	while (!Match(TokenType::OR) && !Match(TokenType::END))
+	while (IsAtomBegin(token_))
 		node->Push(Factor());
 	return node;
 }
@@ -145,6 +149,8 @@ pair<ASTNode*, bool> Parser::Atom()
 		break;
 
 	case TokenType::BACKREF:
+		if (token_.lexeme_ - '0' >= count_)
+			Error("反向引用错误");
 		node = new ASTBackReference(token_.lexeme_ - '0');
 		GetNextToken();
 		break;
@@ -158,6 +164,8 @@ pair<ASTNode*, bool> Parser::Atom()
 			name = Name();
 			// Name() 遇到 > 才返回来，因此不需要检查
 			GetNextToken();
+			if (!nameReferenceSet_.count(name))
+				Error("不可能找到该命名引用");
 			node = new ASTNameReference(name);
 		}
 		else
@@ -207,7 +215,7 @@ pair<ASTNode*, bool> Parser::Atom()
 		node = new ASTEmpty();
 		repeat = true;
 		*/
-		Error("表达式错误");
+		Error("因子错误");
 		break;
 	}
 	return std::make_pair(node, repeat);
@@ -374,6 +382,7 @@ ASTNode* Parser::NotCapture()
 ASTNode* Parser::NameCapture()
 {
 	std::string name = Name(); // Name 遇到 > 就退出
+	nameReferenceSet_.insert(name);
 	GetNextToken();
 
 	// 当 (?<name>) 内为空时
@@ -459,3 +468,22 @@ string Parser::Name()
 	return ans;
 }
 
+bool Parser::IsAtomBegin(Token token)
+{
+	switch (token.type_)
+	{
+	case TokenType::SIMPLECHAR:
+	case TokenType::ANY:
+	case TokenType::NEGATE:
+	case TokenType::DOLLAR:
+	case TokenType::BOUND:
+	case TokenType::NOT_BOUND:
+	case TokenType::BACKREF:
+	case TokenType::NAMEREF:
+	case TokenType::LBRACKET:
+	case TokenType::LP:
+		return true;
+	default:
+		return false;
+	}
+}

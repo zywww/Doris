@@ -3,6 +3,7 @@
 
 #include <tuple>	
 #include <string>
+#include <unordered_set>	
 #include "Lexer.h"
 #include "AST.h"
 
@@ -41,12 +42,14 @@ private:
 	int							Number();
 	std::string					Name();
 	
+	bool						IsAtomBegin(Token token);
 
-	const std::string&	regex_;
-	Lexer				lexer_;
-	Token				token_;
-	ASTNode*			root_ = nullptr;
-	int					count_ = 1;
+	const std::string&					regex_;
+	Lexer								lexer_;
+	Token								token_;
+	ASTNode*							root_ = nullptr;
+	int									count_ = 1;
+	std::unordered_set<std::string>		nameReferenceSet_;
 };
 
 #endif 

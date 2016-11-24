@@ -80,6 +80,14 @@ void testParser()
 	Parser ps25("(?=regex)");
 	Parser ps26("(?!regex)");
 	Parser ps27("()\\1");
+	//Parser ps28("a*b**");
+	Parser ps29("a*|b+|(?:((re|ad{2,3}))*?)|(5)|");
+	Parser ps30("|a");
+	Parser ps31("(asd|asd)");
+	Parser ps32("((a))");
+	Parser ps33("|||");
+	Parser ps34("(||)asd");
+	//Parser ps35("[||]");
 
 	cout << "ÏÂ¶Ïµã" << endl;
 }

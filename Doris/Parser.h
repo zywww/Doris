@@ -13,36 +13,36 @@ public:
 	Parser(const std::string &regex);
 
 	// 对正则表达式进行语法分析，若成功则返回 AST 根结点
-	ASTNode*					Parse();			
-	bool						isDFA();
+	ASTNode*							Parse();			
+	bool								isDFA();
 
 private:
 	// 语法错误
-	void						Error(const std::string &info);			
+	void								Error(const std::string &info);			
 	// 通过 lexer_ 获取下个词法单元
-	void						GetNextToken();		
+	void								GetNextToken();		
 	
 	// 检查当前词法单元是否是 简单字符 ch
-	bool						Match(char ch);
+	bool								Match(char ch);
 	// 检查当前词法单元是否是 某类型元字符
-	bool						Match(TokenType type);
+	bool								Match(TokenType type);
 
 	// 递归下降的语法分析
-	ASTNode*					Regex();
-	ASTNode*					Term();
-	ASTNode*					Factor();
-	std::pair<ASTNode*, bool>	Atom();
-	std::tuple<bool, int, int>	Repeat();			// 返回重复的次数 min, max 和 是否贪婪重复
-	ASTNode*					Charclass();
-	ASTNode*					UnnameCapture();
-	ASTNode*					NameCapture();
-	ASTNode*					NotCapture();
-	ASTNode*					PositiveLookahead();
-	ASTNode*					NegativeLookahead();
-	int							Number();
-	std::string					Name();
+	ASTNode*							Regex();
+	ASTNode*							Term();
+	ASTNode*							Factor();
+	std::pair<ASTNode*, bool>			Atom();
+	std::tuple<bool, int, int>			Repeat();			// 返回重复的次数 min, max 和 是否贪婪重复
+	ASTNode*							Charclass();
+	ASTNode*							UnnameCapture();
+	ASTNode*							NameCapture();
+	ASTNode*							NotCapture();
+	ASTNode*							PositiveLookahead();
+	ASTNode*							NegativeLookahead();
+	int									Number();
+	std::string							Name();
 	
-	bool						IsAtomBegin(Token token);
+	bool								IsAtomBegin(Token token);
 
 	const std::string&					regex_;
 	Lexer								lexer_;

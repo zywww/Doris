@@ -62,8 +62,10 @@ ASTNode* Parser::Regex()
 		GetNextToken();
 		if (Match(TokenType::OR))
 			node->Push(new ASTEmpty());
-		else 
+		else if (IsAtomBegin(token_))
 			node->Push(Term());
+		else
+			node->Push(new ASTEmpty());
 	}
 	
 	return node;
@@ -345,15 +347,16 @@ ASTNode* Parser::Charclass()
 // 进入该函数以确定 ( 开头
 ASTNode* Parser::UnnameCapture()
 {
+	int count = count_++;
 	// 当 () 内为空时
 	if (Match(TokenType::RP))
 	{
 		GetNextToken();
-		return new ASTUnnameCapture(new ASTEmpty(), count_++);
+		return new ASTUnnameCapture(new ASTEmpty(), count);
 	}
 
 	// 当 () 内不为空
-	ASTNode* node = new ASTUnnameCapture(Regex(), count_++);
+	ASTNode* node = new ASTUnnameCapture(Regex(), count);
 	if (!Match(TokenType::RP))
 		Error("缺少 )");
 	GetNextToken();

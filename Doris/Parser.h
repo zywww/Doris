@@ -21,6 +21,7 @@ private:
 	void								Error(const std::string &info);			
 	// 通过 lexer_ 获取下个词法单元
 	void								GetNextToken();		
+	void								Backoff();
 	
 	// 检查当前词法单元是否是 简单字符 ch
 	bool								Match(char ch);
@@ -33,6 +34,7 @@ private:
 	ASTNode*							Factor();
 	std::pair<ASTNode*, bool>			Atom();
 	std::tuple<bool, int, int>			Repeat();			// 返回重复的次数 min, max 和 是否贪婪重复
+	// charclass 应该分出来一个函数判断范围
 	ASTNode*							Charclass();
 	ASTNode*							UnnameCapture();
 	ASTNode*							NameCapture();

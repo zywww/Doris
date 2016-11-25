@@ -25,7 +25,7 @@ enum class TokenType
 	LANGLE,			// <
 	RANGLE,			// >
 	ANY,			// . 通配符 与除 \n 之外的任何单个字符匹配。
-	BACKSLASH,		// \ 反斜杠
+//	BACKSLASH,		// \ 反斜杠
 	MINUS,			// - 连字符	若在 [] 外，则 MINUS 和 simplechar 的 '-' 是同语义的
 
 	WORD,			// \w  ==  [a-zA-Z0-9_]
@@ -50,7 +50,7 @@ struct Token
 	Token(TokenType type, char ch = '\0');
 
 	TokenType		type_;
-	char			lexeme_;	// 只有匹配字符才会用到 lexeme_，简单字符只用到 1 个，
+	char			lexeme_;	// 一般来说，只有匹配字符才会用到 lexeme_，简单字符只用到 1 个，
 								// 还有 \number 的反向引用，将 number 存在 lexeme
 };
 

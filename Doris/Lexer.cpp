@@ -40,6 +40,11 @@ Token Lexer::Lookahead()
 		return Token(TokenType::END);
 }
 
+Token Lexer::Backoff()
+{
+	return stream_[--tokenIndex_ - 1];	// 是否需要判断大于 0
+}
+
 bool Lexer::GetIsDFA()
 {
 	return canGenDFA_;

@@ -39,6 +39,11 @@ void Parser::GetNextToken()
 	token_ = lexer_.GetNextToken();
 }
 
+void Parser::Backoff()
+{
+	token_ = lexer_.Backoff();
+}
+
 bool Parser::Match(char ch)
 {
 	return token_.type_ == TokenType::SIMPLECHAR && token_.lexeme_ == ch;
@@ -379,28 +384,109 @@ ASTNode* Parser::Charclass()
 
 	while (!Match(TokenType::RBRACKET))
 	{
-		if (Match(TokenType::END)) Error("[ ] 构造错误");
-		if (!Match(TokenType::SIMPLECHAR))
-			Error("[ ] 内元字符使用错误");
-		char lhs = token_.lexeme_;
-		GetNextToken();
-		if (Match(TokenType::MINUS))
+		char lhs;
+		bool range = false;
+		switch (token_.type_)
+		{
+		case TokenType::SIMPLECHAR:
+		case TokenType::OR:
+		case TokenType::DOLLAR:
+		case TokenType::QUERY:
+		case TokenType::NEGATE:
+		case TokenType::LBRACE:
+		case TokenType::RBRACE:
+		case TokenType::LP:
+		case TokenType::RP:
+		case TokenType::LANGLE:
+		case TokenType::RANGLE:
+		case TokenType::ANY:
+		case TokenType::BACKSLASH:
+		case TokenType::MINUS:
+			lhs = token_.lexeme_;
+			break;
+
+		case TokenType::WORD:
+			range = true;
+			node->Push('a', 'z');
+			node->Push('A', 'Z');
+			node->Push('0', '9');
+			node->Push('_', '_');
+			GetNextToken();
+			break;
+
+		case TokenType::NOT_WORD:
+			range = true;
+			node->Push(0, '0' - 1);
+			node->Push('9' + 1, 'A' - 1);
+			node->Push('Z' + 1, 'a' - 1);
+			node->Push('z' + 1, 127);
+			GetNextToken();
+			break;
+
+		case TokenType::SPACE:
+			range = true;
+			node->Push(' ', ' ');
+			node->Push('\f', '\f');
+			node->Push('\n', '\n');
+			node->Push('\r', '\r');
+			node->Push('\t', '\t');
+			node->Push('\v', '\v');
+			GetNextToken();
+			break;
+
+		case TokenType::NOT_SPACE:
+			range = true;
+			node->Push('0', '\t' - 1);
+			node->Push('\r' + 1, ' ' - 1);
+			node->Push(' ' + 1, 127);
+			GetNextToken();
+			break;
+
+		case TokenType::DIGIT:
+			range = true;
+			node->Push('0', '9');
+			GetNextToken();
+			break;
+
+		case TokenType::NOT_DIGIT:
+			range = true;
+			node->Push(0, '0' - 1);
+			node->Push('9' + 1, 127);
+			GetNextToken();
+			break;
+
+		default: 
+			Error("[ ] 内错误的词法单元");
+
+		}
+		if (!range)
 		{
 			GetNextToken();
-			if (!Match(TokenType::SIMPLECHAR))
-				Error("[ ] 内元字符使用错误");
-			else if (token_.lexeme_ < lhs)
-				Error("[ ] 内字符范围错误");
-			else
+			if (Match(TokenType::MINUS))
 			{
-				node->Push(lhs, token_.lexeme_);
 				GetNextToken();
+				if (!Match(TokenType::WORD)  && !Match(TokenType::NOT_WORD) &&
+					!Match(TokenType::SPACE) && !Match(TokenType::NOT_SPACE) &&
+					!Match(TokenType::DIGIT) && !Match(TokenType::NOT_DIGIT))
+				{
+					if (token_.lexeme_ < lhs)
+						Error("[ ] 内字符范围错误");
+					node->Push(lhs, token_.lexeme_);
+					GetNextToken();
+				}
+				else
+				{
+					Backoff();
+					node->Push(lhs, lhs);
+				}
 			}
+			else
+				node->Push(lhs, lhs);
 		}
-		else
-			node->Push(lhs, lhs);
 	}
+	// 跳过 ]
 	GetNextToken();
+
 	return node;
 }
 

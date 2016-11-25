@@ -19,8 +19,9 @@ public:
 private:
 	// 语法错误
 	void								Error(const std::string &info);			
-	// 通过 lexer_ 获取下个词法单元
-	void								GetNextToken();		
+	// 获取下个词法单元
+	void								GetNextToken();	
+	// 回退一个词法单元
 	void								Backoff();
 	
 	// 检查当前词法单元是否是 简单字符 ch
@@ -32,9 +33,11 @@ private:
 	ASTNode*							Regex();
 	ASTNode*							Term();
 	ASTNode*							Factor();
+	// 返回结点和是否是可以重复的结构
 	std::pair<ASTNode*, bool>			Atom();
-	std::tuple<bool, int, int>			Repeat();			// 返回重复的次数 min, max 和 是否贪婪重复
-	// charclass 应该分出来一个函数判断范围
+	// 返回重复的次数 min, max 和 是否贪婪重复
+	std::tuple<bool, int, int>			Repeat();			
+	// TODO charclass 应该分出来一个函数判断范围
 	ASTNode*							Charclass();
 	ASTNode*							UnnameCapture();
 	ASTNode*							NameCapture();
@@ -43,10 +46,8 @@ private:
 	ASTNode*							NegativeLookahead();
 	int									Number();
 	std::string							Name();
-	
 	bool								IsAtomBegin(Token token);
 
-	const std::string&					regex_;
 	Lexer								lexer_;
 	Token								token_;
 	ASTNode*							root_ = nullptr;

@@ -10,7 +10,7 @@ using std::get;
 using std::pair;
 
 Parser::Parser(const string &regex) : 
-	regex_(regex), lexer_(regex), token_(TokenType::END)
+	lexer_(regex), token_(TokenType::END)
 {
 	GetNextToken();
 	root_ = Parse();
@@ -390,6 +390,8 @@ ASTNode* Parser::Charclass()
 		{
 		case TokenType::SIMPLECHAR:
 		case TokenType::OR:
+		case TokenType::STAR:
+		case TokenType::PLUS:
 		case TokenType::DOLLAR:
 		case TokenType::QUERY:
 		case TokenType::NEGATE:
@@ -400,7 +402,6 @@ ASTNode* Parser::Charclass()
 		case TokenType::LANGLE:
 		case TokenType::RANGLE:
 		case TokenType::ANY:
-		case TokenType::BACKSLASH:
 		case TokenType::MINUS:
 			lhs = token_.lexeme_;
 			break;

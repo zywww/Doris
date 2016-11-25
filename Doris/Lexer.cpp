@@ -56,6 +56,7 @@ void Lexer::Error(const string &info)
 	throw info;
 }
 
+// 在 [ ] 内的词法单元进行不同的词法分析，比如 - 分析为 simplechar
 void Lexer::Analyze()
 {
 	State state = State::START;

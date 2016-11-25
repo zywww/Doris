@@ -96,7 +96,9 @@ void testParser()
 	Parser ps39("[]");
 	Parser ps40("[1-\\w]");
 	//Parser ps41("[-\\b]");
-	Parser ps42("\\");
+	//Parser ps42("\\");
+	Parser ps43("[^^|*+?^${}()<>.-\\w\\W\\d\\D\\s\\S]");
+	//Parser ps44("[\\k]");
 
 	cout << "ÏÂ¶Ïµã" << endl;
 }

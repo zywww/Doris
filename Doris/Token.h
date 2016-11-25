@@ -3,7 +3,7 @@
 
 // 如果两个符号有不同语义，则应该给他设计一种 token
 // 应该把 (?: (?= (?! \k<name> 等等分析为一个词法单元吗？看看别的实现
-// 
+//
 enum class TokenType
 {
 	SIMPLECHAR,		// 即用来匹配的ASCII字符
@@ -14,7 +14,7 @@ enum class TokenType
 	STAR,			// *
 	PLUS,			// +
 	QUERY,			// ? 即表示 0 或 1 次重复，也表示非贪婪匹配
-	NEGATE,			// ^   取反或者表行首和字符串首
+	NEGATE,			// ^ 取反或者表行首和字符串首
 	DOLLAR,			// $
 	LBRACE,			// {
 	RBRACE,			// }

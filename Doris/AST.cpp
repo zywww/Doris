@@ -49,9 +49,9 @@ ASTCharClass::ASTCharClass(bool negate) :
 {
 }
 
-void ASTCharClass::Push(pair<char, char> range)
+void ASTCharClass::Push(char begin, char end)
 {
-	ranges_.push_back(range);
+	ranges_.push_back(std::make_pair(begin, end));
 }
 
 

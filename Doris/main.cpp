@@ -46,6 +46,8 @@ void testLexer()
 	Lexer lex27(string("a(?!ad)"));
 	Lexer lex28(string("-\\-"));
 	Lexer lex29(string(""));
+	Lexer lex30("\\w\\W\\s\\S\\d\\D");
+
 	cout << "下断点" << endl;
 }
 
@@ -88,6 +90,10 @@ void testParser()
 	Parser ps33("|||");
 	Parser ps34("(||)asd");
 	//Parser ps35("[||]");
+	Parser ps36(".\\w\\W\\s\\S\\d\\D");
+	Parser ps38("\\w\\W\\s\\S\\d\\D*");
+	Parser ps37(".");
+	Parser ps39("[]");
 
 	cout << "下断点" << endl;
 }
@@ -101,6 +107,7 @@ void test()
 int main()
 {
 	test();
+	
 
 	system("pause");
 	return 0;

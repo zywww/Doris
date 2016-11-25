@@ -59,7 +59,8 @@ class ASTCharClass : public ASTNode
 public:
 	ASTCharClass(bool negate);
 
-	void Push(std::pair<char, char> range);
+	void Push(char begin, char end);
+	// charclass 在生成 nfa 时，重新生成最简范围
 	//virtual std::pair<NFAState*, NFAState*> ConstructNFA();
 
 private:
@@ -78,6 +79,7 @@ class ASTCharacter : public ASTNode
 public:
 	ASTCharacter(char ch);
 
+	
 	//virtual std::pair<NFAState*, NFAState*> ConstructNFA();
 
 private:

@@ -122,8 +122,9 @@ pair<ASTNode*, bool> Parser::Atom()
 
 	case TokenType::ANY:
 		temp = new ASTCharClass(true);
-		temp->Push(std::make_pair('\n', '\n'));
+		temp->Push('\n', '\n');
 		node = temp;
+		GetNextToken();
 		break;
 		
 	case TokenType::NEGATE: 
@@ -147,6 +148,64 @@ pair<ASTNode*, bool> Parser::Atom()
 	case TokenType::NOT_BOUND:
 		node = new ASTAnchor(AnchorType::NOT_BOUND);
 		repeat = false;
+		GetNextToken();
+		break;
+		// TODO 此处代码重复，可以简化
+	case TokenType::WORD:
+		temp = new ASTCharClass(false);
+		temp->Push('a', 'z');
+		temp->Push('A', 'Z');
+		temp->Push('0', '9');
+		temp->Push('_', '_');
+		node = temp;
+		GetNextToken();
+		break;
+
+	case TokenType::NOT_WORD:
+		temp = new ASTCharClass(true);
+		temp->Push('a', 'z');
+		temp->Push('A', 'Z');
+		temp->Push('0', '9');
+		temp->Push('_', '_');
+		node = temp;
+		GetNextToken();
+		break;
+
+	case TokenType::SPACE:
+		temp = new ASTCharClass(false);
+		temp->Push(' ', ' ');
+		temp->Push('\f', '\f');
+		temp->Push('\n', '\n');
+		temp->Push('\r', '\r');
+		temp->Push('\t', '\t');
+		temp->Push('\v', '\v');
+		node = temp;
+		GetNextToken();
+		break;
+	
+	case TokenType::NOT_SPACE:
+		temp = new ASTCharClass(true);
+		temp->Push(' ', ' ');
+		temp->Push('\f', '\f');
+		temp->Push('\n', '\n');
+		temp->Push('\r', '\r');
+		temp->Push('\t', '\t');
+		temp->Push('\v', '\v');
+		node = temp;
+		GetNextToken();
+		break;
+
+	case TokenType::DIGIT:
+		temp = new ASTCharClass(false);
+		temp->Push('0', '9');
+		node = temp;
+		GetNextToken();
+		break;
+
+	case TokenType::NOT_DIGIT:
+		temp = new ASTCharClass(true);
+		temp->Push('0', '9');
+		node = temp;
 		GetNextToken();
 		break;
 
@@ -317,6 +376,7 @@ ASTNode* Parser::Charclass()
 	}
 	else
 		node = new ASTCharClass(false);
+
 	while (!Match(TokenType::RBRACKET))
 	{
 		if (Match(TokenType::END)) Error("[ ] 构造错误");
@@ -333,12 +393,12 @@ ASTNode* Parser::Charclass()
 				Error("[ ] 内字符范围错误");
 			else
 			{
-				node->Push(std::make_pair(lhs, token_.lexeme_));
+				node->Push(lhs, token_.lexeme_);
 				GetNextToken();
 			}
 		}
 		else
-			node->Push(std::make_pair(lhs, lhs));
+			node->Push(lhs, lhs);
 	}
 	GetNextToken();
 	return node;
@@ -485,6 +545,12 @@ bool Parser::IsAtomBegin(Token token)
 	case TokenType::NAMEREF:
 	case TokenType::LBRACKET:
 	case TokenType::LP:
+	case TokenType::WORD:
+	case TokenType::NOT_WORD:
+	case TokenType::SPACE:
+	case TokenType::NOT_SPACE:
+	case TokenType::DIGIT:
+	case TokenType::NOT_DIGIT:
 		return true;
 	default:
 		return false;

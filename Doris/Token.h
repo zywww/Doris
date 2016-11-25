@@ -2,7 +2,7 @@
 #define DORIS_TOKEN_H__
 
 // 如果两个符号有不同语义，则应该给他设计一种 token
-// 应该把 (?: 和 (?= 等等分析为一个词法单元吗？看看别的实现
+// 应该把 (?: (?= (?! \k<name> 等等分析为一个词法单元吗？看看别的实现
 // 
 enum class TokenType
 {
@@ -30,7 +30,7 @@ enum class TokenType
 
 	WORD,			// \w  ==  [a-zA-Z0-9_]
 	NOT_WORD,		// \W  ==  [^a-zA-Z0-9_]
-	SPACE,			// \s  ==  [ \t\n]
+	SPACE,			// \s  ==  [ \f\n\r\t\v]
 	NOT_SPACE,		// \S  ==  [^ \t\n]
 	DIGIT,			// \d  ==  [0-9]
 	NOT_DIGIT,		// \D  ==  [^0-9]

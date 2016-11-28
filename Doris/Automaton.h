@@ -6,32 +6,24 @@
 
 
 
-class NFAState
-{
-public:
-	std::vector<NFAEdge*> inEdge_;
-	std::vector<NFAEdge*> outEdge_;
-};
-
-class NFAEdge
-{
-public:
-	NFAEdge(NFAState* start, NFAState* end);
-	NFAState*	start_;
-	NFAState*	end_;
-};
 
 class Automaton
 {
 public:
 	
 
+	std::pair<size_t, size_t> GetCaptureContent(std::string name);
+	void PushPair(int lhs, int rhs);
+
 	// 匿名和命名捕获的内容都存放在这里
 	// name begin, end
-	std::unordered_map<std::string, std::pair<size_t, size_t>> captureContent_;
+	std::unordered_map<std::string, std::pair<size_t, size_t>> captureContents_;
+
+
 
 	const std::string&		regex = std::string();
 	std::string::size_type	index;
+	bool					singleLine_ = false;
 };
 
 

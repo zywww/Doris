@@ -3,8 +3,8 @@
 
 using std::string;
 
-Regex::Regex(const string &regex) :
-	regex_(regex), parser_(regex_)
+Regex::Regex(const string &regex, const string& matchContent) :
+	regex_(regex), matchContent_(matchContent), parser_(regex_)
 {
 	auto root = parser_.GetRoot();
 	auto pair = root->ConstructNFA();

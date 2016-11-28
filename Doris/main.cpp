@@ -93,12 +93,14 @@ void testParser()
 	Parser ps36(".\\w\\W\\s\\S\\d\\D");
 	Parser ps38("\\w\\W\\s\\S\\d\\D*");
 	Parser ps37(".");
-	Parser ps39("[]");
+	//Parser ps39("[]");
 	Parser ps40("[1-\\w]");
 	//Parser ps41("[-\\b]");
 	//Parser ps42("\\");
 	Parser ps43("[^^|*+?^${}()<>.-\\w\\W\\d\\D\\s\\S]");
 	//Parser ps44("[\\k]");
+	//Parser ps45("[^]");
+	Parser ps46("()*");
 
 	cout << "ÏÂ¶Ïµã" << endl;
 }

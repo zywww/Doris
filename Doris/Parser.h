@@ -15,6 +15,7 @@ public:
 	// 对正则表达式进行语法分析，若成功则返回 AST 根结点
 	ASTNode*							Parse();			
 	bool								isDFA();
+	ASTNode*							GetRoot();
 
 private:
 	// 语法错误

@@ -26,7 +26,15 @@ ASTNode* Parser::Parse()
 	return root;
 }
 
-bool Parser::isDFA() { return lexer_.GetIsDFA(); }
+bool Parser::isDFA() 
+{
+	return lexer_.GetIsDFA(); 
+}
+
+ASTNode* Parser::GetRoot()
+{
+	return root_;
+}
 
 void Parser::Error(const string &info)
 {
@@ -381,6 +389,8 @@ ASTNode* Parser::Charclass()
 	}
 	else
 		node = new ASTCharClass(false);
+	if (Match(TokenType::RBRACKET))
+		Error("[ ] 内不允许为空");
 
 	while (!Match(TokenType::RBRACKET))
 	{

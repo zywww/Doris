@@ -1,6 +1,7 @@
 #include <utility>	
 #include <string>
 #include "AST.h"
+#include "NFA.h"
 
 using std::string;
 using std::pair;

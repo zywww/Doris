@@ -14,8 +14,8 @@ public:
 
 	// 对正则表达式进行语法分析，若成功则返回 AST 根结点
 	ASTNode*							Parse();			
-	bool								isDFA();
-	ASTNode*							GetRoot();
+///	bool								isDFA();
+	ASTNode*							GetASTRoot();
 
 private:
 	// 语法错误
@@ -51,7 +51,7 @@ private:
 
 	Lexer								lexer_;
 	Token								token_;
-	ASTNode*							root_ = nullptr;
+	ASTNode*							astRoot_ = nullptr;
 	int									count_ = 1;
 	std::unordered_set<std::string>		nameReferenceSet_;
 };

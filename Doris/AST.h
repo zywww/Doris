@@ -1,13 +1,20 @@
 #ifndef DORIS_AST_H__
 #define DORIS_AST_H__
 
+enum class AnchorType { BEGIN, END, BOUND, NOT_BOUND };
+
 #include <tuple>
 #include <utility>
 #include <vector>
 #include <string>
-#include "DFA.h"	
-#include "NFA.h"
+///#include "DFA.h"	
+//#include "NFA.h"
 
+class NFAState;
+
+
+
+// TODO 实现成抽象类？？
 class ASTNode
 {
 public:
@@ -106,7 +113,7 @@ private:
 	std::string name_;
 };
 
-enum class AnchorType { BEGIN, END, BOUND, NOT_BOUND };
+
 class ASTAnchor : public ASTNode
 {
 public:

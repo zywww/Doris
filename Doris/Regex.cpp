@@ -3,28 +3,16 @@
 
 using std::string;
 
-Regex::Regex(const string &regex, const string& matchContent) :
-	regex_(regex), matchContent_(matchContent), parser_(regex_)
+Regex::Regex(const string &regex) :
+	regex_(regex), parser_(regex_), automaton_(parser_.GetASTRoot())
 {
-	auto root = parser_.GetRoot();
-	auto pair = root->ConstructNFA();
 }
 
+/*
 bool Regex::Parse()
 {
-	/*
-	auto root = parser_.Parse();
-	isDFA_ = parser_.isDFA();
-	if (isDFA_)
-	{
-	//	DFAStart_ = root->constructDFA();
-		
-	}
-	else
-	{
-	//	root->constructNFA();
-	}
-	*/
+
 	return true;
 
 }
+*/

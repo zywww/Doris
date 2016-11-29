@@ -3,6 +3,8 @@
 #include <iostream>	
 #include <cctype>
 #include "NFA.h"
+#include "Automaton.h"
+#include "AST.h"
 
 using std::cout;
 using std::endl;
@@ -135,6 +137,10 @@ bool NFAReferenceEdge::Pass(Automaton* automaton, const std::string& content,
 NFAAnchorEdge::NFAAnchorEdge(NFAState* start, NFAState* end, AnchorType type) :
 	NFAEdge(start, end), type_(type)
 {
+	assert(	type_ == AnchorType::BEGIN ||
+			type_ == AnchorType::BOUND ||
+			type_ == AnchorType::END   ||
+			type_ == AnchorType::NOT_BOUND);
 }
 
 bool NFAAnchorEdge::Pass(Automaton* automaton, const std::string& content,
@@ -178,6 +184,8 @@ bool NFAAnchorEdge::Pass(Automaton* automaton, const std::string& content,
 		return false;
 		break;
 	}
+	
+	return true;
 }
 
 
@@ -204,10 +212,7 @@ NFAStoreEdge::NFAStoreEdge(NFAState* start, NFAState* end, std::string name) :
 bool NFAStoreEdge::Pass(Automaton* automaton, const std::string& content,
 	std::string::size_type index)
 {
-	if (index == lhs_)
-		automaton->PushPair(-2, -2);
-	else
-		automaton->PushPair(lhs_, index - 1);
+	automaton->PushPair(name_, lhs_, index);
 	return true;
 }
 

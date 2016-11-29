@@ -1,10 +1,17 @@
 #ifndef DORIS_NFA_H__
 #define DORIS_NFA_H__
 
+//enum class AnchorType { BEGIN, END, BOUND, NOT_BOUND };
+
 #include <vector>
 #include <string>
 #include <utility>
-#include "Automaton.h"
+
+
+enum class AnchorType;
+class NFAEdge;
+class Automaton;
+
 
 
 class NFAState
@@ -12,6 +19,7 @@ class NFAState
 public:
 	std::vector<NFAEdge*> inEdge_;
 	std::vector<NFAEdge*> outEdge_;
+	bool				  accept_ = false;
 };
 
 class NFAEdge
@@ -46,6 +54,8 @@ public:
 	bool Pass(Automaton* automaton, const std::string& content,
 		std::string::size_type index);
 };
+
+class NFAExitEdge;
 
 class NFARepeatEdge : public NFAEdge
 {
@@ -96,7 +106,6 @@ private:
 	std::string name_;
 };
 
-enum class AnchorType { BEGIN, END, BOUND, NOT_BOUND };
 class NFAAnchorEdge : public NFAEdge
 {
 public:
@@ -108,6 +117,8 @@ public:
 private:
 	AnchorType type_;
 };
+
+class NFAStoreEdge;
 
 class NFAStartEdge : public NFAEdge	
 {

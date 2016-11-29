@@ -13,7 +13,7 @@ Parser::Parser(const string &regex) :
 	lexer_(regex), token_(TokenType::END)
 {
 	GetNextToken();
-	root_ = Parse();
+	astRoot_ = Parse();
 }
 
 ASTNode* Parser::Parse()
@@ -25,15 +25,15 @@ ASTNode* Parser::Parse()
 		Error("±Ì¥Ô Ω¥ÌŒÛ");
 	return root;
 }
-
+/*
 bool Parser::isDFA() 
 {
 	return lexer_.GetIsDFA(); 
 }
-
-ASTNode* Parser::GetRoot()
+*/
+ASTNode* Parser::GetASTRoot()
 {
-	return root_;
+	return astRoot_;
 }
 
 void Parser::Error(const string &info)

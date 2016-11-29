@@ -26,12 +26,12 @@ bool NFAEdge::Pass(Automaton* automaton, const std::string& content,
 
 
 
-NFAMatch::NFAMatch(NFAState* start, NFAState* end, char ch) :
+NFAMatchEdge::NFAMatchEdge(NFAState* start, NFAState* end, char ch) :
 	NFAEdge(start, end), ch_(ch)
 {
 }
 
-bool NFAMatch::Pass(Automaton* automaton, const std::string& content,
+bool NFAMatchEdge::Pass(Automaton* automaton, const std::string& content,
 	std::string::size_type index)
 {
 	if (content[index] == ch_)

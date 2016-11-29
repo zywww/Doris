@@ -34,10 +34,10 @@ private:
 	NFAState*	end_;
 };
 
-class NFAMatch : public NFAEdge
+class NFAMatchEdge : public NFAEdge
 {
 public:
-	NFAMatch(NFAState* start, NFAState* end, char ch);
+	NFAMatchEdge(NFAState* start, NFAState* end, char ch);
 	
 	bool Pass(Automaton* automaton, const std::string& content, 
 		std::string::size_type index);

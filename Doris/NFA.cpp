@@ -2,6 +2,7 @@
 #include <cassert>
 #include <iostream>	
 #include <cctype>
+#include <algorithm>	
 #include "NFA.h"
 #include "Automaton.h"
 #include "AST.h"
@@ -10,12 +11,23 @@ using std::cout;
 using std::endl;
 using std::string;
 
+void NFAState::ReverseEdgeOrder()
+{
+	// 调用这个函数时，该状态只有两条出边，调整边的顺序是为了实现非贪婪匹配
+	std::reverse(outEdge_.begin(), outEdge_.end());
+}
+
 // 用友类来实现？？
 NFAEdge::NFAEdge(NFAState* start, NFAState* end) :
 	start_(start), end_(end)
 {
 	start_->outEdge_.push_back(this);
 	end_->inEdge_.push_back(this);
+}
+
+void NFAEdge::ChangeStartState(NFAState* newStart)
+{
+	start_ = newStart;
 }
 
 bool NFAEdge::Pass(Automaton* automaton, const std::string& content,

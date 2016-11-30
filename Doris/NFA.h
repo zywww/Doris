@@ -19,6 +19,7 @@ class NFAState
 public:
 	std::vector<NFAEdge*> inEdge_;
 	std::vector<NFAEdge*> outEdge_;
+	void ReverseEdgeOrder();
 	bool				  accept_ = false;
 };
 
@@ -26,6 +27,8 @@ class NFAEdge
 {
 public:
 	NFAEdge(NFAState* start, NFAState* end);
+
+	void ChangeStartState(NFAState* newStart);
 	virtual bool Pass(Automaton* automaton, const std::string& content, 
 		std::string::size_type index);
 

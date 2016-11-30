@@ -3,6 +3,7 @@
 #include <string>
 #include "Lexer.h"
 #include "Parser.h"
+#include "Regex.h"
 
 using std::string;
 using std::endl;
@@ -105,10 +106,41 @@ void testParser()
 	cout << "下断点" << endl;
 }
 
+void testNFA()
+{
+	Regex re1("abc");
+	Regex re2("ab|cd");
+	Regex re3("");
+	Regex re4("()");
+	Regex re5("|");
+	Regex re6("(|)");
+	Regex re7("b*");
+	Regex re8("b*?");
+	Regex re9("b+");
+	Regex re10("b+?");
+	Regex re11("b?");
+	Regex re12("b??");
+	Regex re13("b{2,4}");
+	Regex re14("b{2,4}?");
+	Regex re15("b{2,}");
+	Regex re16("b{2,}?");
+	Regex re17("b{2}");
+	Regex re18("b{2}?");
+	Regex re19("b{0,3}");
+	Regex re20("b{0,3}?");
+	Regex re21("[1-2abc\\w]");
+	Regex re22("(a)\\1");
+	Regex re23("(?<name>ab)\\k<name>");
+	Regex re24("\\b\\B$^");
+
+	cout << "下断点" << endl;
+}
+
 void test()
 {
 	//testLexer();
-	testParser();
+	//testParser();
+	testNFA();
 }
 
 int main()

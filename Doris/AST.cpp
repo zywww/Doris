@@ -53,18 +53,24 @@ void ASTCat::Push(ASTNode* node)
 	nodeVec_.push_back(node);
 }
 
+// 可以证明每个结构生成的 NFA 的 start 状态只有出边，end 状态只有入边
 std::pair<NFAState*, NFAState*> ASTCat::ConstructNFA()
 {
 	assert(nodeVec_.size() != 0);
-	// 怎么证明每个独立结构的 nfa 的 end 没有出边， start 没有入边
-	// TODO 可以优化
+	
 	auto pair = nodeVec_[0]->ConstructNFA();
 	auto start = pair.first;
 	auto end = pair.second;
 	for (int i = 1; i < nodeVec_.size(); ++i)
 	{
 		auto tempPair = nodeVec_[i]->ConstructNFA();
-		new NFAEmptyEdge(end, tempPair.first);
+		for (auto outEdge : tempPair.first->outEdge_)
+		{
+			outEdge->ChangeStartState(end);
+			end->outEdge_.push_back(outEdge);
+		}
+			
+		// delete tempPair.first; // 释放内存？
 		end = tempPair.second;
 	}
 	return make_pair(start, end);
@@ -81,10 +87,22 @@ std::pair<NFAState*, NFAState*> ASTRepeat::ConstructNFA()
 	auto start = new NFAState;
 	auto end = new NFAState;
 	auto exitEdge = new NFAExitEdge(pair.second, end);
-	new NFARepeatEdge(pair.second, pair.first, min_, max_, exitEdge);
-	new NFAEmptyEdge(start, pair.first);
-	if (!min_)
-		new NFAEmptyEdge(start, end);
+	if (greedy_)
+	{
+		new NFARepeatEdge(pair.second, pair.first, min_, max_, exitEdge);
+		pair.second->ReverseEdgeOrder();
+		new NFAEmptyEdge(start, pair.first);
+		if (!min_)
+			new NFAEmptyEdge(start, end);
+	}
+	else
+	{
+		new NFARepeatEdge(pair.second, pair.first, min_, max_, exitEdge);
+		if (!min_)
+			new NFAEmptyEdge(start, end);
+		new NFAEmptyEdge(start, pair.first);
+	}
+	
 	return make_pair(start, end);
 }
 

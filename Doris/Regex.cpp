@@ -8,11 +8,7 @@ Regex::Regex(const string &regex) :
 {
 }
 
-/*
-bool Regex::Parse()
+bool Regex::Match(const string& matchContent)
 {
-
 	return true;
-
 }
-*/

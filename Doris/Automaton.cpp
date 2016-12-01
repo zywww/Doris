@@ -24,3 +24,30 @@ void Automaton::PushPair(string name, size_t lhs, size_t rhs)
 {
 	captureContents_.insert(make_pair(name, make_pair(lhs, rhs)));
 }
+
+pair<int, int> Automaton::RunNFA(const std::string& content, int startIndex)
+{
+	int result = DFSNFA(start_, content, startIndex);
+	if (result == -1)
+		return make_pair(-1, -1);
+	else
+		return make_pair(startIndex, result);
+}
+
+int	Automaton::DFSNFA(NFAState* start, const std::string& content, int index)
+{
+	if (start->accept_) return index;
+	
+	for (auto edge : start->outEdge_)
+	{
+		size_t indexTemp = index;
+		// 调用 pass 的时候，由 pass 函数内部判断指针是否合法，不合法则不能通过
+		if (edge->Pass(this, content, indexTemp))
+		{
+			int result = DFSNFA(edge->end_, content, indexTemp);
+			if (result >= 0)
+				return result;
+		}
+	}
+	return -1;
+}

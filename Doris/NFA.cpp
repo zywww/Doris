@@ -31,7 +31,7 @@ void NFAEdge::ChangeStartState(NFAState* newStart)
 }
 
 bool NFAEdge::Pass(Automaton* automaton, const std::string& content,
-	std::string::size_type index)
+	std::string::size_type &index)
 {
 	return true;
 }
@@ -44,9 +44,10 @@ NFAMatchEdge::NFAMatchEdge(NFAState* start, NFAState* end, char ch) :
 }
 
 bool NFAMatchEdge::Pass(Automaton* automaton, const std::string& content,
-	std::string::size_type index)
+	std::string::size_type &index)
 {
-	if (content[index] == ch_)
+	
+	if (index < content.size() && content[index++] == ch_)
 		return true;
 	else
 		return false;
@@ -60,7 +61,7 @@ NFAEmptyEdge::NFAEmptyEdge(NFAState* start, NFAState* end) :
 }
 
 bool NFAEmptyEdge::Pass(Automaton* automaton, const std::string& content,
-	std::string::size_type index)
+	std::string::size_type &index)
 {
 	return true;
 }
@@ -76,7 +77,7 @@ NFARepeatEdge::NFARepeatEdge(NFAState* start, NFAState* end, int min, int max,
 }
 
 bool NFARepeatEdge::Pass(Automaton* automaton, const std::string& content,
-	std::string::size_type index)
+	std::string::size_type &index)
 {
 	// 循环已经达到最低要求
 	if (!min_)
@@ -96,7 +97,8 @@ NFAExitEdge::NFAExitEdge(NFAState* start, NFAState*end) :
 {
 }
 
-bool NFAExitEdge::Pass()
+bool NFAExitEdge::Pass(Automaton* automaton, const std::string& content,
+	std::string::size_type &index)
 {
 	return canExit;
 }
@@ -109,9 +111,10 @@ NFARangeEdge::NFARangeEdge(NFAState* start, NFAState* end, char lhs, char rhs) :
 }
 
 bool NFARangeEdge::Pass(Automaton* automaton, const std::string& content,
-	std::string::size_type index)
+	std::string::size_type &index)
 {
-	if (content[index] >= lhs_ && content[index] <= rhs_)
+	auto tempIndex = index++;
+	if (tempIndex < content.size() && content[tempIndex] >= lhs_ && content[tempIndex] <= rhs_)
 		return true;
 	else
 		return false;
@@ -125,7 +128,7 @@ NFAReferenceEdge::NFAReferenceEdge(NFAState* start, NFAState* end, string name) 
 }
 
 bool NFAReferenceEdge::Pass(Automaton* automaton, const std::string& content,
-	std::string::size_type index)
+	std::string::size_type &index)
 {
 	auto pair = automaton->GetCaptureContent(name_);
 	if (pair.first == -1)
@@ -137,8 +140,10 @@ bool NFAReferenceEdge::Pass(Automaton* automaton, const std::string& content,
 	// first 值为 -2 表示捕获到空内容
 	if (pair.first == -2)
 		return true;
+	// 判断未匹配的内容长度是否足够，若不足够则不能通过
 	if (pair.second - pair.first + 1 > content.size() - index)
 		return false;
+		
 	for (auto i = pair.first; i <= pair.second; ++i)
 		if (content[i] != content[index++])	return false;
 	return true;
@@ -149,14 +154,10 @@ bool NFAReferenceEdge::Pass(Automaton* automaton, const std::string& content,
 NFAAnchorEdge::NFAAnchorEdge(NFAState* start, NFAState* end, AnchorType type) :
 	NFAEdge(start, end), type_(type)
 {
-	assert(	type_ == AnchorType::BEGIN ||
-			type_ == AnchorType::BOUND ||
-			type_ == AnchorType::END   ||
-			type_ == AnchorType::NOT_BOUND);
 }
 
 bool NFAAnchorEdge::Pass(Automaton* automaton, const std::string& content,
-	std::string::size_type index)
+	std::string::size_type &index)
 {
 	auto isWord = [](char ch) -> bool
 	{
@@ -208,7 +209,7 @@ NFAStartEdge::NFAStartEdge(NFAState* start, NFAState* end, NFAStoreEdge* storeEd
 }
 
 bool NFAStartEdge::Pass(Automaton* automaton, const std::string& content,
-	std::string::size_type index)
+	std::string::size_type &index)
 {
 	storeEdge_->SetLhs(index);
 	return true;
@@ -222,7 +223,7 @@ NFAStoreEdge::NFAStoreEdge(NFAState* start, NFAState* end, std::string name) :
 }
 
 bool NFAStoreEdge::Pass(Automaton* automaton, const std::string& content,
-	std::string::size_type index)
+	std::string::size_type &index)
 {
 	automaton->PushPair(name_, lhs_, index);
 	return true;
@@ -242,7 +243,8 @@ NFALookaheadEdge::NFALookaheadEdge(NFAState* start, NFAState* end, bool negate,
 {
 }
 
-bool NFALookaheadEdge::Pass()
+bool NFALookaheadEdge::Pass(Automaton* automaton, const std::string& content,
+	std::string::size_type &index)
 {
 	// TODO
 	return true;

@@ -18,6 +18,11 @@ public:
 	std::pair<size_t, size_t>	GetCaptureContent(std::string name);
 	void						PushPair(std::string name, size_t lhs, size_t rhs);
 
+	// 若找到则返回区间，否则返回 -1，-1
+	std::pair<int, int>	RunNFA(const std::string& content, int startIndex = 0);
+	// 若可以达到接受状态，则返回 index，否则返回 -1
+	int					DFSNFA(NFAState* start, const std::string& content, int startIndex = 0);
+
 	
 	//const std::string&		regex = std::string();
 	//std::string::size_type	index;

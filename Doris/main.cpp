@@ -136,11 +136,24 @@ void testNFA()
 	cout << "下断点" << endl;
 }
 
+void testMatch()
+{
+	cout << "re1 " << Regex("ab").Match("abc") << endl;
+	cout << "re2 " << Regex("a*").Match("aaaa") << endl;
+	cout << "re3 " << Regex("a*").Match("a") << endl;
+	cout << "re4 " << Regex("a*").Match("") << endl;
+	cout << "re5 " << Regex("a*").Match("aaaaaaaaaaaab") << endl;
+
+
+	cout << "下断点" << endl;
+}
+
 void test()
 {
 	//testLexer();
 	//testParser();
-	testNFA();
+	//testNFA();
+	testMatch();
 }
 
 int main()

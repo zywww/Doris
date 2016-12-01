@@ -10,5 +10,12 @@ Regex::Regex(const string &regex) :
 
 bool Regex::Match(const string& matchContent)
 {
+	auto pair = automaton_.RunNFA(matchContent);
+	if (pair.second == matchContent.size())	return true;
+	else return false;
+}
+
+bool Regex::Search(const std::string& searchContent, int startIndex)
+{
 	return true;
 }

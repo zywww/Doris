@@ -30,9 +30,9 @@ public:
 
 	void ChangeStartState(NFAState* newStart);
 	virtual bool Pass(Automaton* automaton, const std::string& content, 
-		std::string::size_type index);
+		std::string::size_type &index);
 
-private:
+//private:
 	NFAState*	start_;
 	NFAState*	end_;
 };
@@ -42,8 +42,8 @@ class NFAMatchEdge : public NFAEdge
 public:
 	NFAMatchEdge(NFAState* start, NFAState* end, char ch);
 	
-	bool Pass(Automaton* automaton, const std::string& content, 
-		std::string::size_type index);
+	bool Pass(Automaton* automaton, const std::string& content,
+		std::string::size_type &index);
 
 private:
 	char ch_;
@@ -55,7 +55,7 @@ public:
 	NFAEmptyEdge(NFAState* start, NFAState* end);
 
 	bool Pass(Automaton* automaton, const std::string& content,
-		std::string::size_type index);
+		std::string::size_type &index);
 };
 
 class NFAExitEdge;
@@ -66,7 +66,7 @@ public:
 	NFARepeatEdge(NFAState* start, NFAState* end, int min, int max, NFAExitEdge* exitEdge);
 	
 	bool Pass(Automaton* automaton, const std::string& content,
-		std::string::size_type index);
+		std::string::size_type &index);
 
 private:
 	int				min_;
@@ -79,7 +79,8 @@ class NFAExitEdge : public NFAEdge
 public:
 	NFAExitEdge(NFAState* start, NFAState* end);
 
-	bool Pass();
+	bool Pass(Automaton* automaton, const std::string& content,
+		std::string::size_type &index);
 
 	bool canExit = false;
 };
@@ -90,7 +91,7 @@ public:
 	NFARangeEdge(NFAState* start, NFAState* end, char lhs, char rhs);
 
 	bool Pass(Automaton* automaton, const std::string& content,
-		std::string::size_type index);
+		std::string::size_type &index);
 
 private:
 	char lhs_;
@@ -103,7 +104,7 @@ public:
 	NFAReferenceEdge(NFAState* start, NFAState* end, std::string name);
 
 	bool Pass(Automaton* automaton, const std::string& content,
-		std::string::size_type index);
+		std::string::size_type &index);
 
 private:
 	std::string name_;
@@ -115,7 +116,7 @@ public:
 	NFAAnchorEdge(NFAState* start, NFAState* end, AnchorType type);
 
 	bool Pass(Automaton* automaton, const std::string& content,
-		std::string::size_type index);
+		std::string::size_type &index);
 
 private:
 	AnchorType type_;
@@ -129,7 +130,7 @@ public:
 	NFAStartEdge(NFAState* start, NFAState* end, NFAStoreEdge* storeEdge);
 
 	bool Pass(Automaton* automaton, const std::string& content,
-		std::string::size_type index);
+		std::string::size_type &index);
 
 private:
 	NFAStoreEdge* storeEdge_;
@@ -141,7 +142,7 @@ public:
 	NFAStoreEdge(NFAState* start, NFAState* end, std::string name);
 
 	bool Pass(Automaton* automaton, const std::string& content,
-		std::string::size_type index);
+		std::string::size_type &index);
 	void SetLhs(int lhs);
 
 private:
@@ -156,7 +157,8 @@ public:
 	NFALookaheadEdge(NFAState* start, NFAState* end, bool negate,
 		NFAState* lookaheadStart, NFAState* lookaheadEnd);
 
-	bool Pass();
+	bool Pass(Automaton* automaton, const std::string& content,
+		std::string::size_type &index);
 
 private:
 	bool negate_;

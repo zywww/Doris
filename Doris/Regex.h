@@ -15,7 +15,7 @@ public:
 	Regex(const std::string &regex);
 
 	bool				Match(const std::string& matchContent);
-	bool				Search(const std::string& searchContent);	// 暂时不用
+	bool				Search(const std::string& searchContent, int startIndex = 0);	// 暂时不用
 	bool				Replace();	// 暂时不用
 
 private:

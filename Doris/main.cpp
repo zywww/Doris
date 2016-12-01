@@ -138,13 +138,17 @@ void testNFA()
 
 void testMatch()
 {
-	cout << "re1 " << Regex("ab").Match("abc") << endl;
-	cout << "re2 " << Regex("a*").Match("aaaa") << endl;
-	cout << "re3 " << Regex("a*").Match("a") << endl;
-	cout << "re4 " << Regex("a*").Match("") << endl;
-	cout << "re5 " << Regex("a*").Match("aaaaaaaaaaaab") << endl;
-
-
+	cout << "re1  " << Regex("ab").Match("abc") << endl;
+	cout << "re2  " << Regex("a*").Match("aaaa") << endl;
+	cout << "re3  " << Regex("a*").Match("a") << endl;
+	cout << "re4  " << Regex("a*").Match("") << endl;
+	cout << "re5  " << Regex("a*").Match("aaaaaaaaaaaab") << endl;
+	cout << "re6  " << Regex("ab*").Match("abb") << endl;
+	cout << "re7  " << Regex("ab*").Match("abbb") << endl;
+	cout << "re8  " << Regex("ab*").Match("a") << endl;
+	cout << "re9  " << Regex("b?").Match("bb") << endl;
+	cout << "re10 " << Regex("b{0}").Match("bb") << endl;
+	Regex re("b{0}");
 	cout << "ÏÂ¶Ïµã" << endl;
 }
 

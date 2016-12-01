@@ -72,23 +72,22 @@ NFARepeatEdge::NFARepeatEdge(NFAState* start, NFAState* end, int min, int max,
 	NFAExitEdge* exitEdge) :
 	NFAEdge(start, end), min_(min), max_(max), exitEdge_(exitEdge)
 {
-	assert(min_ >= 0);
-	assert(max_ == -1 || max_ >= 0);
 }
 
 bool NFARepeatEdge::Pass(Automaton* automaton, const std::string& content,
 	std::string::size_type &index)
 {
-	// 循环已经达到最低要求
-	if (!min_)
-		exitEdge_->canExit = true;
-	// max 值为 -1 表示最多可以重复无穷次
-	bool result = max_ == -1 || max_ > 0;
+	
 	// TODO 这里立即减一合适吗？
 	if (max_ > 0) --max_;
 	// min_ 减到为 0 就不需要再减了，且 min_ 的初始化不可能为负数
 	if (min_ > 0) --min_;
-	return result;
+
+	// 循环已经达到最低要求
+	if (!min_)
+		exitEdge_->canExit = true;
+	// max 值为 -1 表示最多可以重复无穷次
+	return max_ == -1 || max_ > 0;
 }
 
 

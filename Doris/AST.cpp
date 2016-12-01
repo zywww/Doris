@@ -86,6 +86,11 @@ std::pair<NFAState*, NFAState*> ASTRepeat::ConstructNFA()
 	auto pair = node_->ConstructNFA();
 	auto start = new NFAState;
 	auto end = new NFAState;
+	if (!max_)
+	{
+		new NFAEmptyEdge(start, end);
+		return make_pair(start, end);
+	}
 	auto exitEdge = new NFAExitEdge(pair.second, end);
 	if (greedy_)
 	{

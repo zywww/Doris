@@ -1,3 +1,4 @@
+#include <iostream>	
 #include "Automaton.h"
 
 using std::string;
@@ -22,6 +23,7 @@ pair<size_t, size_t> Automaton::GetCaptureContent(string name)
 
 void Automaton::PushPair(string name, size_t lhs, size_t rhs)
 {
+	std::cout << lhs << " " << rhs << std::endl;
 	captureContents_.insert(make_pair(name, make_pair(lhs, rhs)));
 }
 
@@ -34,11 +36,11 @@ pair<int, int> Automaton::RunNFA(const std::string& content, int startIndex)
 		return make_pair(startIndex, result);
 }
 
-int	Automaton::DFSNFA(NFAState* start, const std::string& content, int index)
+int	Automaton::DFSNFA(NFAState* state, const std::string& content, int index)
 {
-	if (start->accept_) return index;
+	if (state->accept_) return index;
 	
-	for (auto edge : start->outEdge_)
+	for (auto edge : state->outEdge_)
 	{
 		size_t indexTemp = index;
 		// 调用 pass 的时候，由 pass 函数内部判断指针是否合法，不合法则不能通过

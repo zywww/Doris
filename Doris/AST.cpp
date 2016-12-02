@@ -2,6 +2,7 @@
 #include <string>
 #include <cassert>
 #include <algorithm>
+#include <iostream>
 #include "AST.h"
 #include "NFA.h"
 
@@ -86,11 +87,14 @@ std::pair<NFAState*, NFAState*> ASTRepeat::ConstructNFA()
 	auto pair = node_->ConstructNFA();
 	auto start = new NFAState;
 	auto end = new NFAState;
+	// 如果重复的最大次数为 0，那么可以优化为空边
 	if (!max_)
 	{
 		new NFAEmptyEdge(start, end);
 		return make_pair(start, end);
 	}
+
+	/*
 	auto exitEdge = new NFAExitEdge(pair.second, end);
 	if (greedy_)
 	{
@@ -107,7 +111,30 @@ std::pair<NFAState*, NFAState*> ASTRepeat::ConstructNFA()
 			new NFAEmptyEdge(start, end);
 		new NFAEmptyEdge(start, pair.first);
 	}
-	
+	*/
+
+	auto exitEdge = new NFAExitEdge(pair.second, end);
+	auto startEdge = new NFAStartRepeatEdge(start, pair.first);
+	if (greedy_)
+	{
+		auto repeatEdge = new NFARepeatEdge(pair.second, pair.first, min_, max_, exitEdge);
+		startEdge->repeatEdge_ = repeatEdge;
+		startEdge->exitEdge_ = exitEdge;
+		exitEdge->SetRepeatEdge(repeatEdge);
+		pair.second->ReverseEdgeOrder();
+		if (!min_)
+			new NFAEmptyEdge(start, end);
+	}
+	else
+	{
+		auto repeatEdge = new NFARepeatEdge(pair.second, pair.first, min_, max_, exitEdge);
+		startEdge->repeatEdge_ = repeatEdge;
+		startEdge->exitEdge_ = exitEdge;
+		exitEdge->SetRepeatEdge(repeatEdge);
+		if (!min_)
+			new NFAEmptyEdge(start, end);
+	}
+
 	return make_pair(start, end);
 }
 
@@ -124,6 +151,7 @@ void ASTCharClass::Push(char begin, char end)
 
 std::pair<NFAState*, NFAState*> ASTCharClass::ConstructNFA()
 {
+	// TODO 对于 negate 的实现
 	// TODO 可以优化
 	auto start = new NFAState;
 	auto end = new NFAState;
@@ -228,10 +256,11 @@ std::pair<NFAState*, NFAState*> ASTUnnameCapture::ConstructNFA()
 	int number = number_;
 	while (number)
 	{
-		name += number % 10;
+		name += number % 10 + '0';
 		number /= 10;
 	}
 	std::reverse(name.begin(), name.end());
+	
 
 	auto start = new NFAState;
 	auto end = new NFAState;

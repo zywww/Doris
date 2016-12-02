@@ -68,10 +68,33 @@ bool NFAEmptyEdge::Pass(Automaton* automaton, const std::string& content,
 
 
 
+NFAStartRepeatEdge::NFAStartRepeatEdge(NFAState* start, NFAState* end) :
+	NFAEdge(start, end)
+{
+}
+
+void NFAStartRepeatEdge::SetRepeatEdge(NFARepeatEdge* repeatEdge)
+{
+	repeatEdge_ = repeatEdge;
+}
+
+bool NFAStartRepeatEdge::Pass(Automaton* automaton, const std::string& content,
+	std::string::size_type &index)
+{
+	repeatEdge_->SetIndex(index);
+	exitEdge_->canExit = false;
+	return true;
+}
+
+
+
+
 NFARepeatEdge::NFARepeatEdge(NFAState* start, NFAState* end, int min, int max, 
 	NFAExitEdge* exitEdge) :
 	NFAEdge(start, end), min_(min), max_(max), exitEdge_(exitEdge)
 {
+	exitEdge_->min_ = min_;
+	exitEdge_->max_ = max_;
 }
 
 bool NFARepeatEdge::Pass(Automaton* automaton, const std::string& content,
@@ -86,8 +109,22 @@ bool NFARepeatEdge::Pass(Automaton* automaton, const std::string& content,
 	// 循环已经达到最低要求
 	if (!min_)
 		exitEdge_->canExit = true;
+
+	// 如果循环无上限并且该次循环匹配内容为空，则不允许再次循环，因为下次循环依然为空
+	// 会造成匹配空内容并且无限循环，但是如果是有限次数的，则可以多次匹配空内容
+	if (max_ == -1 && index == startIndex_)
+		return false;
+	// 设置重复的位置为当前位置
+	startIndex_ = index;
+	
+
 	// max 值为 -1 表示最多可以重复无穷次
 	return max_ == -1 || max_ > 0;
+}
+
+void NFARepeatEdge::SetIndex(int index)
+{
+	startIndex_ = index;
 }
 
 
@@ -99,7 +136,14 @@ NFAExitEdge::NFAExitEdge(NFAState* start, NFAState*end) :
 bool NFAExitEdge::Pass(Automaton* automaton, const std::string& content,
 	std::string::size_type &index)
 {
+	repeatEdge_->min_ = min_;
+	repeatEdge_->max_ = max_;
 	return canExit;
+}
+
+void NFAExitEdge::SetRepeatEdge(NFARepeatEdge* repeatEdge)
+{
+	repeatEdge_ = repeatEdge;
 }
 
 
@@ -113,7 +157,7 @@ bool NFARangeEdge::Pass(Automaton* automaton, const std::string& content,
 	std::string::size_type &index)
 {
 	auto tempIndex = index++;
-	if (tempIndex < content.size() && content[tempIndex] >= lhs_ && content[tempIndex] <= rhs_)
+	if (tempIndex < content.size() &&  lhs_ <= content[tempIndex] && content[tempIndex] <= rhs_)
 		return true;
 	else
 		return false;
@@ -130,19 +174,22 @@ bool NFAReferenceEdge::Pass(Automaton* automaton, const std::string& content,
 	std::string::size_type &index)
 {
 	auto pair = automaton->GetCaptureContent(name_);
+	std::cout << "pass func " << pair.first << " " << pair.second <<
+		" index = " << index << endl;
+
+	// 若 pair.first == -1 则说明还没捕获到内容
+	// TODO 可能出现这种情况吗 在语法分析已经证明不可能了把
 	if (pair.first == -1)
-	{
-		cout << "尚未捕获到内容" << endl;
-		assert(false);
-	}
+		return true;
 
 	// first 值为 -2 表示捕获到空内容
 	if (pair.first == -2)
 		return true;
 	// 判断未匹配的内容长度是否足够，若不足够则不能通过
-	if (pair.second - pair.first + 1 > content.size() - index)
+	if (pair.second - pair.first > content.size() - index)
 		return false;
 		
+	
 	for (auto i = pair.first; i <= pair.second; ++i)
 		if (content[i] != content[index++])	return false;
 	return true;
@@ -224,7 +271,12 @@ NFAStoreEdge::NFAStoreEdge(NFAState* start, NFAState* end, std::string name) :
 bool NFAStoreEdge::Pass(Automaton* automaton, const std::string& content,
 	std::string::size_type &index)
 {
-	automaton->PushPair(name_, lhs_, index);
+	//cout << name_ << endl;
+	
+	// 即该捕获为空，说明里面的正则表达式匹配的内容为空，则不放进捕获列表
+	// 那引用的内容为空怎么办
+	if (lhs_ != index)
+		automaton->PushPair(name_, lhs_, index);
 	return true;
 }
 

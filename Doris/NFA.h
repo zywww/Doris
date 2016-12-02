@@ -59,6 +59,22 @@ public:
 };
 
 class NFAExitEdge;
+class NFARepeatEdge;
+
+class NFAStartRepeatEdge : public NFAEdge
+{
+public:
+	NFAStartRepeatEdge(NFAState* start, NFAState* end);
+	
+	void SetRepeatEdge(NFARepeatEdge* repeatEdge);
+
+	bool Pass(Automaton* automaton, const std::string& content,
+		std::string::size_type &index);
+
+
+	NFARepeatEdge*	repeatEdge_ = nullptr;
+	NFAExitEdge*	exitEdge_ = nullptr;
+};
 
 class NFARepeatEdge : public NFAEdge
 {
@@ -68,10 +84,14 @@ public:
 	bool Pass(Automaton* automaton, const std::string& content,
 		std::string::size_type &index);
 
-private:
+	void SetIndex(int index);
+
+
 	int				min_;
 	int				max_;
+private:
 	NFAExitEdge*	exitEdge_;
+	int				startIndex_;
 };
 
 class NFAExitEdge : public NFAEdge
@@ -82,7 +102,15 @@ public:
 	bool Pass(Automaton* automaton, const std::string& content,
 		std::string::size_type &index);
 
+	void SetRepeatEdge(NFARepeatEdge* repeatEdge);
+
 	bool canExit = false;
+
+	int min_;
+	int max_;
+
+private:
+	NFARepeatEdge* repeatEdge_ = nullptr;
 };
 
 class NFARangeEdge : public NFAEdge

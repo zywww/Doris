@@ -117,6 +117,7 @@ void Lexer::Analyze()
 		case State::BACKSLASH:
 			switch (ch)
 			{
+			case 'f': push(TokenType::SIMPLECHAR, '\f'); break;
 			case 'n': push(TokenType::SIMPLECHAR, '\n'); break;
 			case 'r': push(TokenType::SIMPLECHAR, '\r'); break;
 			case 't': push(TokenType::SIMPLECHAR, '\t'); break;

@@ -36,6 +36,11 @@ ASTNode* Parser::GetASTRoot()
 	return astRoot_;
 }
 
+bool Parser::GetNotGreedy()
+{
+	return notGreedy_;
+}
+
 void Parser::Error(const string &info)
 {
 	cout << info << endl;
@@ -376,6 +381,8 @@ std::tuple<bool, int, int>	Parser::Repeat()
 			GetNextToken();
 		}
 	}
+
+	notGreedy_ = !greedy;
 	return	std::make_tuple(greedy, min, max);
 }
 

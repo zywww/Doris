@@ -132,7 +132,11 @@ std::pair<NFAState*, NFAState*> ASTRepeat::ConstructNFA()
 		startEdge->exitEdge_ = exitEdge;
 		exitEdge->SetRepeatEdge(repeatEdge);
 		if (!min_)
+		{
 			new NFAEmptyEdge(start, end);
+			start->ReverseEdgeOrder();
+		}
+			
 	}
 
 	return make_pair(start, end);
@@ -297,6 +301,7 @@ std::pair<NFAState*, NFAState*> ASTPstLookahead::ConstructNFA()
 	auto start = new NFAState;
 	auto end = new NFAState;
 	auto pair = node_->ConstructNFA();
+	pair.second->accept_ = true;
 	new NFALookaheadEdge(start, end, false, pair.first, pair.second);
 	return make_pair(start, end);
 }
@@ -312,6 +317,7 @@ std::pair<NFAState*, NFAState*> ASTNgtLookahead::ConstructNFA()
 	auto start = new NFAState;
 	auto end = new NFAState;
 	auto pair = node_->ConstructNFA();
+	pair.second->accept_ = true;
 	new NFALookaheadEdge(start, end, true, pair.first, pair.second);
 	return make_pair(start, end);
 }

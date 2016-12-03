@@ -174,8 +174,8 @@ bool NFAReferenceEdge::Pass(Automaton* automaton, const std::string& content,
 	std::string::size_type &index)
 {
 	auto pair = automaton->GetCaptureContent(name_);
-	std::cout << "pass func " << pair.first << " " << pair.second <<
-		" index = " << index << endl;
+	//std::cout << "pass func " << pair.first << " " << pair.second <<
+	//	" index = " << index << endl;
 
 	// 若 pair.first == -1 则说明还没捕获到内容
 	// TODO 可能出现这种情况吗 在语法分析已经证明不可能了把
@@ -190,7 +190,7 @@ bool NFAReferenceEdge::Pass(Automaton* automaton, const std::string& content,
 		return false;
 		
 	
-	for (auto i = pair.first; i <= pair.second; ++i)
+	for (auto i = pair.first; i < pair.second; ++i)
 		if (content[i] != content[index++])	return false;
 	return true;
 }
@@ -222,10 +222,10 @@ bool NFAAnchorEdge::Pass(Automaton* automaton, const std::string& content,
 
 	case AnchorType::END:
 		// TODO 这里的 size - 1 会溢出
-		if (automaton->singleLine_ && index + 1 == content.size()) return true;
+		if (automaton->singleLine_ && index == content.size()) return true;
 		if (!automaton->singleLine_ &&
-			(index + 1 == content.size() ||
-				index + 1 < content.size() && content[index + 1] == '\n'))
+			(index == content.size() ||
+				index < content.size() && content[index] == '\n'))
 			return true;
 		return false;
 		break;
@@ -297,6 +297,9 @@ NFALookaheadEdge::NFALookaheadEdge(NFAState* start, NFAState* end, bool negate,
 bool NFALookaheadEdge::Pass(Automaton* automaton, const std::string& content,
 	std::string::size_type &index)
 {
-	// TODO
-	return true;
+	int indexTemp = index;
+	int result = automaton->DFSNFA(lookaheadStart_, content, indexTemp, false);
+	//cout << "预查到的位置: " << result << endl;
+	//cout << "negate: " << negate_ << endl;
+	return result == -1 && negate_ || result != -1 && !negate_;
 }

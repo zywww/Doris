@@ -16,6 +16,7 @@ public:
 	ASTNode*							Parse();			
 ///	bool								isDFA();
 	ASTNode*							GetASTRoot();
+	bool								GetNotGreedy();
 
 private:
 	// Óï·¨´íÎó
@@ -54,6 +55,7 @@ private:
 	ASTNode*							astRoot_ = nullptr;
 	int									count_ = 1;
 	std::unordered_set<std::string>		nameReferenceSet_;
+	bool								notGreedy_ = false;
 };
 
 #endif 

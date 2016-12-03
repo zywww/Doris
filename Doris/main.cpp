@@ -1,6 +1,7 @@
 #include <iostream>	
 #include <cstdlib>
 #include <string>
+#include <cassert>
 #include "Lexer.h"
 #include "Parser.h"
 #include "Regex.h"
@@ -138,52 +139,76 @@ void testNFA()
 
 void testMatch()
 {
-	
-/*1 0*/	cout << "re1  " << Regex("ab").Match("abc") << endl;
-/*2 1*/	cout << "re2  " << Regex("a*").Match("aaaa") << endl;
-/*3 1*/	cout << "re3  " << Regex("a*").Match("a") << endl;
-/*4 1*/	cout << "re4  " << Regex("a*").Match("") << endl;
-/*5 0*/	cout << "re5  " << Regex("a*").Match("aaaaaaaaaaaab") << endl;
-/*6 1*/	cout << "re6  " << Regex("ab*").Match("abb") << endl;
-/*7 1*/	cout << "re7  " << Regex("ab*").Match("abbb") << endl;
-/*8 1*/	cout << "re8  " << Regex("ab*").Match("a") << endl;
-/*9 0*/	cout << "re9  " << Regex("b?").Match("bb") << endl;
-/*10 0*/cout << "re10 " << Regex("b{0}").Match("bb") << endl;
-/*11 0*/cout << "re11 " << Regex("a|bbb").Match("bb") << endl;
-/*12 0*/cout << "re12 " << Regex("a*|bbb").Match("bb") << endl;
-/*13 1*/cout << "re13 " << Regex("a|b*").Match("bb") << endl;	
-/*14 1*/cout << "re14 " << Regex("(a*)*").Match("") << endl;
-/*15 1*/cout << "re15 " << Regex("(a*)*").Match("aaaa") << endl;
-/*16 0*/cout << "re16 " << Regex("(a*)*|bbb").Match("bbb") << endl;
-/*17 1*/cout << "re17 " << Regex("[ab]*").Match("bbb") << endl;
-/*18 1*/cout << "re18 " << Regex("([ab]*)").Match("bbb") << endl;
-/*19 0*/cout << "re19 " << Regex("a+").Match("") << endl;
-/*20 1*/cout << "re20 " << Regex("a+").Match("a") << endl;
-/*22 1*/cout << "re22 " << Regex("a+").Match("aaa") << endl;
-/*23 0*/cout << "re23 " << Regex("a?").Match("aaa") << endl;
-/*24 1*/cout << "re24 " << Regex("a?").Match("a") << endl;
-/*25 1*/cout << "re25 " << Regex("a?").Match("") << endl;
-/*26 0*/cout << "re26 " << Regex("a{2}").Match("aaa") << endl;
-/*27 1*/cout << "re27 " << Regex("a{2}").Match("aa") << endl;
-/*28 1*/cout << "re28 " << Regex("a{2,}").Match("aaaaa") << endl;
-/*29 1*/cout << "re29 " << Regex("a{2,}").Match("aa") << endl;
-/*30 0*/cout << "re30 " << Regex("a{2,}").Match("a") << endl;
-/*31 0*/cout << "re31 " << Regex("a{2,3}").Match("a") << endl;
-/*32 1*/cout << "re32 " << Regex("a{2,3}").Match("aa") << endl;
-/*33 1*/cout << "re33 " << Regex("a{2,3}").Match("aaa") << endl;
-/*34 0*/cout << "re34 " << Regex("a{2,3}").Match("aaaa") << endl;
-/*35 0*/cout << "re35 " << Regex("[a-ce]*").Match("abcd") << endl;
-/*36 1*/cout << "re36 " << Regex("[a-ce]*").Match("abc") << endl;
-/*37 1*/cout << "re37 " << Regex("[a-ce]*").Match("abce") << endl;
-/*38 1*/cout << "re38 " << Regex("[a-ce-r]*").Match("abce") << endl;
-/*39 0*/cout << "re39 " << Regex("[a-ce-r]*").Match("abces") << endl;
-/*40 1*/cout << "re40 " << Regex("[a-c\\w]*").Match("abasdlkjaslkdz13152_ce") << endl;
-/*41 0*/cout << "re41 " << Regex("[\\s]*").Match("abasdlkjaslkdz13152_ce") << endl;
-/*42 1*/cout << "re42 " << Regex("[\\s]*").Match("   \f\n\r\t\v") << endl;
-/*43 1*/cout << "re43 " << Regex("(abc)\\1").Match("abcabc") << endl;
-Regex re("(abc)\\1");
-cout << re.Match("abcabc") << endl;
-
+	assert(Regex("ab").Match("abc") == false);
+	assert(Regex("a*").Match("aaaa") == true);
+	assert(Regex("a*").Match("a") == true);
+	assert(Regex("a*").Match("") == true);
+	assert(Regex("a*").Match("aaaaaaaaaaaab") == false);
+	assert(Regex("ab*").Match("abb") == true);
+	assert(Regex("ab*").Match("abbb") == true);
+	assert(Regex("ab*").Match("a") == true);
+	assert(Regex("b?").Match("bb") == false);
+	assert(Regex("b{0}").Match("bb") == false);
+	assert(Regex("a|bbb").Match("bb") == false);
+	assert(Regex("a*|bbb").Match("bb") == false);
+	assert(Regex("a|b*").Match("bb") == true);
+	assert(Regex("(a*)*").Match("") == true);
+	assert(Regex("(a*)*").Match("aaaa") == true);
+	assert(Regex("(a*)*|bbb").Match("bbb") == false);
+	assert(Regex("[ab]*").Match("bbb") == true);
+	assert(Regex("([ab]*)").Match("bbb") == true);
+	assert(Regex("a+").Match("") == false);
+	assert(Regex("a+").Match("a") == true);
+	assert(Regex("a+").Match("aaa") == true);
+	assert(Regex("a?").Match("aaa") == false);
+	assert(Regex("a?").Match("a") == true);
+	assert(Regex("a?").Match("") == true);
+	assert(Regex("a{2}").Match("aaa") == false);
+	assert(Regex("a{2}").Match("aa") == true);
+	assert(Regex("a{2,}").Match("aaaaa") == true);
+	assert(Regex("a{2,}").Match("aa") == true);
+	assert(Regex("a{2,}").Match("a") == false);
+	assert(Regex("a{2,3}").Match("a") == false);
+	assert(Regex("a{2,3}").Match("aa") == true);
+	assert(Regex("a{2,3}").Match("aaa") == true);
+	assert(Regex("a{2,3}").Match("aaaa") == false);
+	assert(Regex("[a-ce]*").Match("abcd") == false);
+	assert(Regex("[a-ce]*").Match("abc") == true);
+	assert(Regex("[a-ce]*").Match("abce") == true);
+	assert(Regex("[a-ce-r]*").Match("abce") == true);
+	assert(Regex("[a-ce-r]*").Match("abces") == false);
+	assert(Regex("[a-c\\w]*").Match("abasdlkjaslkdz13152_ce") == true);
+	assert(Regex("[\\s]*").Match("abasdlkjaslkdz13152_ce") == false);
+	assert(Regex("[\\s]*").Match("   \f\n\r\t\v") == true);
+	assert(Regex("(abc)\\1").Match("abcabc") == true);
+	assert(Regex("(abc)\\1*").Match("abcabc") == true);
+	assert(Regex("(abc)\\1*").Match("abcabcabcabc") == true);
+	assert(Regex("(abc)\\1*").Match("abc") == true);
+	assert(Regex("()*").Match("abcabc") == false);
+	assert(Regex("(?<name>abc)").Match("abc") == true);
+	assert(Regex("(?<name>abc)\\k<name>").Match("abc") == false);
+	assert(Regex("(?<name>abc)\\k<name>*").Match("abc") == true);
+	assert(Regex("(?<name>abc)\\k<name>*").Match("abcabcabc") == true);
+	assert(Regex("(?<name>abc)\\k<name>*").Match("abcabca") == false);
+	assert(Regex("\\ba").Match("a") == true);
+	assert(Regex("\\ba\\b").Match("a") == true);
+	assert(Regex("\\ba\\b").Match("ab") == false);
+	assert(Regex("\\ba\\B").Match("a") == false);
+	assert(Regex("\\ba\\Bb").Match("ab") == true);
+	assert(Regex("^ab").Match("ab") == true);
+	assert(Regex("a^b").Match("ab") == false);
+	assert(Regex("a$").Match("a") == true);
+	assert(Regex("a^\\nb").Match("a\nb") == true);
+	assert(Regex("((\\w) \\2)*").Match("a ab b") == true);
+	assert(Regex("(a*?)").Match("aa") == true);
+	assert(Regex("(?=ab)ab").Match("ab") == true);
+	assert(Regex("(?!ab)ab").Match("ab") == false);
+	assert(Regex("(?=a*)b").Match("b") == true);
+	assert(Regex("(?=a*)b").Match("bc") == false);
+	assert(Regex("(?=a*)b").Match("aaaaaaab") == false);
+	assert(Regex("(?=$)").Match("") == true);
+	assert(Regex("(?!$)").Match("") == false);
+	assert(Regex("(?=(a))\\1").Match("a") == true);
 
 
 
@@ -195,13 +220,24 @@ void test()
 	//testLexer();
 	//testParser();
 	//testNFA();
+	
+	
+	
 	testMatch();
+
+
+	
+	//cout << "¶Ïµã" << endl;
 }
 
 int main()
 {
 	test();
-	
+	/*std::unordered_map<int, int> umap;
+	umap.insert(std::make_pair(1, 2));
+	umap.insert(std::make_pair(1, 1));
+	umap[1] = 1;
+	umap[3] = 4;*/
 
 	system("pause");
 	return 0;

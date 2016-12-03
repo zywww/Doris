@@ -1,4 +1,5 @@
 #include <string>
+#include <iostream>
 #include "Regex.h"
 
 using std::string;
@@ -10,12 +11,14 @@ Regex::Regex(const string &regex) :
 
 bool Regex::Match(const string& matchContent)
 {
-	auto pair = automaton_.RunNFA(matchContent);
+	//std::cout << "parser_.notgreedy:" << parser_.GetNotGreedy() << std::endl;
+	auto pair = automaton_.RunNFA(matchContent, 0, parser_.GetNotGreedy());
 	if (pair.second == matchContent.size())	return true;
 	else return false;
 }
 
 bool Regex::Search(const std::string& searchContent, int startIndex)
 {
+	auto pair = automaton_.RunNFA(searchContent, startIndex, false);
 	return true;
 }

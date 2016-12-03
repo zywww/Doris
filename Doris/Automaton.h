@@ -19,9 +19,11 @@ public:
 	void						PushPair(std::string name, size_t lhs, size_t rhs);
 
 	// 若找到则返回区间，否则返回 -1，-1
-	std::pair<int, int>	RunNFA(const std::string& content, int startIndex = 0);
+	std::pair<int, int>	RunNFA(const std::string& content, int startIndex = 0, 
+		bool matchNotGreedy = false);
 	// 若可以达到接受状态，则返回 index，否则返回 -1
-	int					DFSNFA(NFAState* start, const std::string& content, int startIndex = 0);
+	int					DFSNFA(NFAState* start, const std::string& content, int startIndex = 0,
+		bool matchNotGreedy = false);
 
 	
 	//const std::string&		regex = std::string();

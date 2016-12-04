@@ -155,15 +155,52 @@ void ASTCharClass::Push(char begin, char end)
 
 std::pair<NFAState*, NFAState*> ASTCharClass::ConstructNFA()
 {
-	// TODO 对于 negate 的实现
-	// TODO 可以优化
+	// TODO 实现成一条边会不会更好
+	
+
+	std::sort(ranges_.begin(), ranges_.end(),
+		[](pair<char, char> lhs, pair<char, char> rhs)
+	{
+		if (lhs.first < rhs.first) return true;
+		else if (lhs.first == rhs.first) return lhs.second < rhs.second;
+		else return false;
+	});
+	decltype(ranges_) newRange;
+	char lhs = ranges_[0].first, rhs = ranges_[0].second;
+	for (auto p : ranges_)
+		if (rhs + 1 >= p.first) rhs = std::max(rhs, p.second);
+		else
+		{
+			newRange.push_back(std::make_pair(lhs, rhs));
+			lhs = p.first;
+			rhs = p.second;
+		}
+	newRange.push_back(std::make_pair(lhs, rhs));
+
+	decltype(newRange) ranges;
+	if (negate_)
+	{
+		if (newRange[0].first != 0) 
+			ranges.push_back(std::make_pair(0, newRange[0].first - 1));
+		for (int i = 1; i < newRange.size(); ++i)
+			ranges.push_back(make_pair(newRange[i - 1].second + 1, newRange[i].first - 1));
+		if (newRange[newRange.size() - 1].second != 127)
+			ranges.push_back(make_pair(newRange[newRange.size() - 1].second + 1, 127));
+		newRange = ranges;
+	}
+	
+	/*
+	for (auto p : newRange)
+		std::cout << (int)p.first << " " << (int)p.second << std::endl;
+	*/
+
 	auto start = new NFAState;
 	auto end = new NFAState;
-	if (ranges_.size() == 1)
-		new NFARangeEdge(start, end, ranges_[0].first, ranges_[0].second);
+	if (newRange.size() == 1)
+		new NFARangeEdge(start, end, newRange[0].first, newRange[0].second);
 	else
 	{
-		for (auto pair : ranges_)
+		for (auto pair : newRange)
 		{
 			auto tempStart = new NFAState;
 			auto tempEnd = new NFAState;
@@ -172,6 +209,7 @@ std::pair<NFAState*, NFAState*> ASTCharClass::ConstructNFA()
 			new NFARangeEdge(tempStart, tempEnd, pair.first, pair.second);
 		}
 	}
+
 	return make_pair(start, end);
 }
 

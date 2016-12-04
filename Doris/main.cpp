@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <string>
 #include <cassert>
+#include <algorithm>
 #include "Lexer.h"
 #include "Parser.h"
 #include "Regex.h"
@@ -209,8 +210,42 @@ void testMatch()
 	assert(Regex("(?=$)").Match("") == true);
 	assert(Regex("(?!$)").Match("") == false);
 	assert(Regex("(?=(a))\\1").Match("a") == true);
-
-
+	assert(Regex("\\x21").Match("!") == true);
+	assert(Regex("\\w*").Match("abcdefghijklmnopqrstuvwxyz_1234567890") == true);
+	assert(Regex("\\W*").Match("abcdefghijklmnopqrstuvwxyz_1234567890") == false);
+	assert(Regex("\\W*").Match("!)(*%") == true);
+	assert(Regex("\\d*").Match("1234567890") == true);
+	assert(Regex("\\D*").Match("1234567890") == false);
+	assert(Regex("\\D*").Match("afdnfbkljslkarjlkajtgw)_&&()_") == true);
+	assert(Regex("\\s*").Match("   \n") == true);
+	assert(Regex("\\S*").Match("1234567890") == true);
+	assert(Regex("(?:a*)(b)\\1").Match("aaaabb") == true);
+	assert(Regex("(?:a(bb))\\1").Match("abbbb") == true);
+	assert(Regex("(?:a(bb*))a\\1").Match("abbabb") == true);
+	assert(Regex("(?:a(?<name>bb*))a\\k<name>").Match("abbabb") == true);
+	assert(Regex("(a*(b*))c\\1\\2").Match("abcab") == false);
+	assert(Regex("(a*(b*))c\\1\\2").Match("abcabb") == true);
+	// 3 的倍数
+	Regex threes("^([0369]|([147]|[258][0369]*[258])([147][0369]*[258]|[0369])*[258]|([258]|[147][0369]*[147])([258][0369]*[147]|[0369])*[147])+$");
+	assert(threes.Match("3") == true);
+	assert(threes.Match("333333") == true);
+	assert(threes.Match("369") == true);
+	assert(threes.Match("81") == true);
+	assert(threes.Match("55") == false);
+	assert(threes.Match("0") == true);
+	assert(threes.Match("101") == false);
+	assert(threes.Match("102") == true);
+	assert(threes.Match("103") == false);
+	assert(Regex(".").Match("5") == true);
+	assert(Regex(".").Match("asdasd") == false);
+	assert(Regex(".").Match("\n") == false);
+	assert(Regex(".*").Match("asdaqwe54q4e68712741oixn a\\sd") == true);
+	assert(Regex("a*?a*").Match("aaaaaa") == true);
+	assert(Regex("()\\1").Match("") == true);
+	Regex email("[\\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\\w-]*[\\w])?\.)+[\\w](?:[\\w-]*[\\w])?");
+	assert(email.Match("869039077@qq.com") == true);
+	assert(email.Match("869039077@adasd.com") == true);
+	//Regex re("\\x21");
 
 	cout << "下断点" << endl;
 }
@@ -220,24 +255,43 @@ void test()
 	//testLexer();
 	//testParser();
 	//testNFA();
+	Regex re("[\\w~-]");
 	
-	
-	
-	testMatch();
 
-
+	//testMatch();
 	
-	//cout << "断点" << endl;
+	
+	cout << "断点" << endl;
 }
 
 int main()
 {
 	test();
-	/*std::unordered_map<int, int> umap;
-	umap.insert(std::make_pair(1, 2));
-	umap.insert(std::make_pair(1, 1));
-	umap[1] = 1;
-	umap[3] = 4;*/
+
+	/*std::vector<std::pair<int, int>> ranges_{ {1,2},{2,2},{4,5},{6,7},{7,9} };
+	std::sort(ranges_.begin(), ranges_.end(),
+		[](std::pair<int, int> lhs, std::pair<int, int> rhs)
+	{
+		if (lhs.first < rhs.first) return true;
+		else if (lhs.first == rhs.first) return lhs.second < rhs.second;
+		else return false;
+	});
+	for (auto p : ranges_)
+		cout << p.first << " " << p.second << endl;
+	decltype(ranges_) ans;
+	int begin = ranges_[0].first, end = ranges_[0].second;
+	for (auto p : ranges_)
+		if (end + 1 >= p.first) end = std::max(end, p.second);
+		else
+		{
+			ans.push_back(std::make_pair(begin, end));
+			begin = p.first;
+			end = p.second;
+		}
+	ans.push_back(std::make_pair(begin, end));
+	cout << endl;
+	for (auto p : ans)
+		cout << p.first << " " << p.second << endl;*/
 
 	system("pause");
 	return 0;

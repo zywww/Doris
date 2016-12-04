@@ -23,7 +23,7 @@ pair<size_t, size_t> Automaton::GetCaptureContent(string name)
 
 void Automaton::PushPair(string name, size_t lhs, size_t rhs)
 {
-	std::cout << name << " " <<  lhs << " " << rhs << std::endl;
+	//std::cout << name << " " <<  lhs << " " << rhs << std::endl;
 	captureContents_[name] = make_pair(lhs, rhs);
 }
 

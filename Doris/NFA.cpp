@@ -68,64 +68,85 @@ bool NFAEmptyEdge::Pass(Automaton* automaton, const std::string& content,
 
 
 
-NFAStartRepeatEdge::NFAStartRepeatEdge(NFAState* start, NFAState* end) :
-	NFAEdge(start, end)
+NFAStartRepeatEdge::NFAStartRepeatEdge(NFAState* start, NFAState* end, int min, int max) :
+	NFAEdge(start, end), min_(min), max_(max)
 {
 }
 
-void NFAStartRepeatEdge::SetRepeatEdge(NFARepeatEdge* repeatEdge)
+void NFAStartRepeatEdge::SetEdges(NFASetRepeatEdge* set, NFARepeatEdge* repeat, NFAExitEdge* exit)
 {
-	repeatEdge_ = repeatEdge;
+	setEdge_ = set;
+	repeatEdge_ = repeat;
+	exitEdge_	= exit;
 }
 
 bool NFAStartRepeatEdge::Pass(Automaton* automaton, const std::string& content,
 	std::string::size_type &index)
 {
-	repeatEdge_->SetIndex(index);
-	exitEdge_->canExit = false;
+	// 重新设置 set 边的 min 和 max，因为如果有重复嵌套的话，比如 (a*)* 该内部重复
+	// 会运行多次，所以每次重新运行重复时，由 start 重置 set 边的 min 和 max
+	setEdge_->startIndex_ = index;
+	setEdge_->min_ = min_;
+	setEdge_->max_ = max_;
+
+	// repeat 边 pass 默认为 true，因为一开始总是可以重复的，最后只会由可重复变为不可重复
+	// set 边只会设置为 false
+	repeatEdge_->pass_ = true;
+
+	// exit 边的 pass 默认初始化为 false，因为一开始总是不可退出的，最后只会由 false 变为 true
+	// set 边只会设置为 true
+	exitEdge_->pass_ = false;
 	return true;
 }
 
 
 
-
-NFARepeatEdge::NFARepeatEdge(NFAState* start, NFAState* end, int min, int max, 
-	NFAExitEdge* exitEdge) :
-	NFAEdge(start, end), min_(min), max_(max), exitEdge_(exitEdge)
+NFASetRepeatEdge::NFASetRepeatEdge(NFAState* start, NFAState* end) :
+	NFAEdge(start, end)
 {
-	exitEdge_->min_ = min_;
-	exitEdge_->max_ = max_;
 }
 
-bool NFARepeatEdge::Pass(Automaton* automaton, const std::string& content,
+bool NFASetRepeatEdge::Pass(Automaton* automaton, const std::string& content,
 	std::string::size_type &index)
 {
-	
-	// TODO 这里立即减一合适吗？
 	if (max_ > 0) --max_;
 	// min_ 减到为 0 就不需要再减了，且 min_ 的初始化不可能为负数
 	if (min_ > 0) --min_;
 
 	// 循环已经达到最低要求
 	if (!min_)
-		exitEdge_->canExit = true;
+		exitEdge_->pass_ = true;
 
 	// 如果循环无上限并且该次循环匹配内容为空，则不允许再次循环，因为下次循环依然为空
 	// 会造成匹配空内容并且无限循环，但是如果是有限次数的，则可以多次匹配空内容
-	if (max_ == -1 && index == startIndex_)
-		return false;
+	if (max_ == -1 && index == startIndex_ || max_ == 0)
+		repeatEdge_->pass_ = false;
+
 	// 设置重复的位置为当前位置
 	startIndex_ = index;
-	
-
-	// max 值为 -1 表示最多可以重复无穷次
-	return max_ == -1 || max_ > 0;
+	return true;
 }
 
-void NFARepeatEdge::SetIndex(int index)
+
+void NFASetRepeatEdge::SetEdges(NFARepeatEdge* repeat, NFAExitEdge* exit)
 {
-	startIndex_ = index;
+	repeatEdge_ = repeat;
+	exitEdge_ = exit;
 }
+
+
+
+NFARepeatEdge::NFARepeatEdge(NFAState* start, NFAState* end) :
+	NFAEdge(start, end)
+{
+}
+
+bool NFARepeatEdge::Pass(Automaton* automaton, const std::string& content,
+	std::string::size_type &index)
+{
+	return pass_;
+}
+
 
 
 NFAExitEdge::NFAExitEdge(NFAState* start, NFAState*end) :
@@ -136,16 +157,13 @@ NFAExitEdge::NFAExitEdge(NFAState* start, NFAState*end) :
 bool NFAExitEdge::Pass(Automaton* automaton, const std::string& content,
 	std::string::size_type &index)
 {
+	/*
 	repeatEdge_->min_ = min_;
 	repeatEdge_->max_ = max_;
 	return canExit;
+	*/
+	return pass_;
 }
-
-void NFAExitEdge::SetRepeatEdge(NFARepeatEdge* repeatEdge)
-{
-	repeatEdge_ = repeatEdge;
-}
-
 
 
 NFARangeEdge::NFARangeEdge(NFAState* start, NFAState* end, char lhs, char rhs) :

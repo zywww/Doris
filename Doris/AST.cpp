@@ -96,24 +96,6 @@ std::pair<NFAState*, NFAState*> ASTRepeat::ConstructNFA()
 
 	/*
 	auto exitEdge = new NFAExitEdge(pair.second, end);
-	if (greedy_)
-	{
-		new NFARepeatEdge(pair.second, pair.first, min_, max_, exitEdge);
-		pair.second->ReverseEdgeOrder();
-		new NFAEmptyEdge(start, pair.first);
-		if (!min_)
-			new NFAEmptyEdge(start, end);
-	}
-	else
-	{
-		new NFARepeatEdge(pair.second, pair.first, min_, max_, exitEdge);
-		if (!min_)
-			new NFAEmptyEdge(start, end);
-		new NFAEmptyEdge(start, pair.first);
-	}
-	*/
-
-	auto exitEdge = new NFAExitEdge(pair.second, end);
 	auto startEdge = new NFAStartRepeatEdge(start, pair.first);
 	if (greedy_)
 	{
@@ -137,6 +119,22 @@ std::pair<NFAState*, NFAState*> ASTRepeat::ConstructNFA()
 			start->ReverseEdgeOrder();
 		}
 			
+	}
+	*/
+
+	auto mid = new NFAState;
+	auto startEdge	= new NFAStartRepeatEdge(start, pair.first, min_, max_);
+	auto setEdge	= new NFASetRepeatEdge(pair.second, mid);
+	auto repeatEdge = new NFARepeatEdge(mid, pair.first);
+	auto exitEdge	= new NFAExitEdge(mid, end);
+	if (!min_)
+		new NFAEmptyEdge(start, end);
+	startEdge->SetEdges(setEdge, repeatEdge, exitEdge);
+	setEdge->SetEdges(repeatEdge, exitEdge);
+	if (!greedy_)
+	{
+		start->ReverseEdgeOrder();
+		mid->ReverseEdgeOrder();
 	}
 
 	return make_pair(start, end);

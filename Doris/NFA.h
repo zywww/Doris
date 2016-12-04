@@ -60,38 +60,52 @@ public:
 
 class NFAExitEdge;
 class NFARepeatEdge;
+class NFASetRepeatEdge;
 
 class NFAStartRepeatEdge : public NFAEdge
 {
 public:
-	NFAStartRepeatEdge(NFAState* start, NFAState* end);
-	
-	void SetRepeatEdge(NFARepeatEdge* repeatEdge);
+	NFAStartRepeatEdge(NFAState* start, NFAState* end, int min, int max);
 
 	bool Pass(Automaton* automaton, const std::string& content,
 		std::string::size_type &index);
 
+	void SetEdges(NFASetRepeatEdge* set, NFARepeatEdge* repeat, NFAExitEdge* exit);
 
-	NFARepeatEdge*	repeatEdge_ = nullptr;
-	NFAExitEdge*	exitEdge_ = nullptr;
+	int min_;
+	int max_;
+	NFASetRepeatEdge*	setEdge_;
+	NFARepeatEdge*		repeatEdge_;
+	NFAExitEdge*		exitEdge_;
+};
+
+class NFASetRepeatEdge : public NFAEdge
+{
+public:
+	NFASetRepeatEdge(NFAState* start, NFAState* end);
+
+	bool Pass(Automaton* automaton, const std::string& content,
+		std::string::size_type &index);
+
+	void SetEdges(NFARepeatEdge* repeat, NFAExitEdge* exit);
+
+	int min_;
+	int max_;
+	int startIndex_;
+
+	NFARepeatEdge*	repeatEdge_;
+	NFAExitEdge*	exitEdge_;
 };
 
 class NFARepeatEdge : public NFAEdge
 {
 public:
-	NFARepeatEdge(NFAState* start, NFAState* end, int min, int max, NFAExitEdge* exitEdge);
+	NFARepeatEdge(NFAState* start, NFAState* end);
 	
 	bool Pass(Automaton* automaton, const std::string& content,
 		std::string::size_type &index);
 
-	void SetIndex(int index);
-
-
-	int				min_;
-	int				max_;
-private:
-	NFAExitEdge*	exitEdge_;
-	int				startIndex_;
+	bool pass_;
 };
 
 class NFAExitEdge : public NFAEdge
@@ -102,15 +116,7 @@ public:
 	bool Pass(Automaton* automaton, const std::string& content,
 		std::string::size_type &index);
 
-	void SetRepeatEdge(NFARepeatEdge* repeatEdge);
-
-	bool canExit = false;
-
-	int min_;
-	int max_;
-
-private:
-	NFARepeatEdge* repeatEdge_ = nullptr;
+	bool pass_;
 };
 
 class NFARangeEdge : public NFAEdge

@@ -155,7 +155,7 @@ void testMatch()
 	assert(Regex("a|b*").Match("bb") == true);
 	assert(Regex("(a*)*").Match("") == true);
 	assert(Regex("(a*)*").Match("aaaa") == true);
-	assert(Regex("(a*)*|bbb").Match("bbb") == false);
+	assert(Regex("(a*)*|bbb").Match("bbb") == true);
 	assert(Regex("[ab]*").Match("bbb") == true);
 	assert(Regex("([ab]*)").Match("bbb") == true);
 	assert(Regex("a+").Match("") == false);
@@ -242,9 +242,14 @@ void testMatch()
 	assert(Regex(".*").Match("asdaqwe54q4e68712741oixn a\\sd") == true);
 	assert(Regex("a*?a*").Match("aaaaaa") == true);
 	assert(Regex("()\\1").Match("") == true);
-	Regex email("[\\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\\w-]*[\\w])?\.)+[\\w](?:[\\w-]*[\\w])?");
+	Regex email("[\\w!#$%&'*+/=?^_`{|}~\\-]+(?:\\.[\\w!#$%&'*+/=?^_`{|}~\\-]+)*@(?:[\\w](?:[\\w-]*[\\w])?\\.)+[\\w](?:[\\w-]*[\\w])?");
 	assert(email.Match("869039077@qq.com") == true);
 	assert(email.Match("869039077@adasd.com") == true);
+	assert(email.Match("869039077adascom") == false);
+	assert(Regex("|").Match("") == true);
+	assert(Regex("|a").Match("a") == true);
+	assert(Regex("b{1,}?b").Match("bb") == true);
+	assert(Regex("(a*?)*").Match("aa") == true);
 	//Regex re("\\x21");
 
 	cout << "ÏÂ¶Ïµã" << endl;
@@ -255,10 +260,10 @@ void test()
 	//testLexer();
 	//testParser();
 	//testNFA();
-	Regex re("[\\w~-]");
-	
+	Regex re("b{1,}?b");
+	cout << re.Match("bb") << endl;
 
-	//testMatch();
+	testMatch();
 	
 	
 	cout << "¶Ïµã" << endl;

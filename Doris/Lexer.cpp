@@ -3,7 +3,9 @@
 #include <regex>
 #include <vector>
 #include <utility>
+#include <ctime>
 #include "Lexer.h"
+#include "Debug.h"
 
 using std::cout;
 using std::endl;
@@ -19,9 +21,20 @@ enum class State
 
 Lexer::Lexer(const string &regex) : regex_(regex)
 {
+
+#ifdef DORIS_DEBUG
+	clock_t start = clock(), end;
+	start = clock();
+#endif
+
 	// 因为一个正则表达式和一个 lexer 对应，所以解析放在构造函数中
 	Analyze();
 	canGenDFA_ = isDFA();
+
+#ifdef DORIS_DEBUG
+	end = clock();
+	cout << "Lexer: " << (double)(end - start) << "s" << endl;
+#endif
 }
 
 Token Lexer::GetNextToken()

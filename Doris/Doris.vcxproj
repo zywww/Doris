@@ -123,6 +123,7 @@
   <ItemGroup>
     <ClInclude Include="AST.h" />
     <ClInclude Include="Automaton.h" />
+    <ClInclude Include="Debug.h" />
     <ClInclude Include="DFA.h" />
     <ClInclude Include="Lexer.h" />
     <ClInclude Include="NFA.h" />

@@ -1,5 +1,6 @@
 #include <iostream>	
 #include "Automaton.h"
+#include "Debug.h"
 
 using std::string;
 using std::pair;
@@ -7,10 +8,20 @@ using std::make_pair;
 
 Automaton::Automaton(ASTNode* root)
 {
+#ifdef DORIS_DEBUG
+	clock_t start = clock(), end;
+	start = clock();
+#endif
+
 	auto pair = root->ConstructNFA();
 	pair.second->accept_ = true;
 	start_ = pair.first;
 	end_ = pair.second;
+
+#ifdef DORIS_DEBUG
+	end = clock();
+	std::cout << "gen AST: " << (double)(end - start) << "s" << std::endl;
+#endif
 }
 
 pair<size_t, size_t> Automaton::GetCaptureContent(string name)

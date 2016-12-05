@@ -2,7 +2,9 @@
 #include <tuple>	
 #include <cctype>	
 #include <algorithm>
+#include <ctime>
 #include "Parser.h"
+#include "Debug.h"
 
 using std::cout;
 using std::endl;
@@ -13,8 +15,19 @@ using std::pair;
 Parser::Parser(const string &regex) : 
 	lexer_(regex), token_(TokenType::END)
 {
+#ifdef DORIS_DEBUG
+	clock_t start = clock(), end;
+	start = clock();
+#endif
+
 	GetNextToken();
 	astRoot_ = Parse();
+
+
+#ifdef DORIS_DEBUG
+	end = clock();
+	cout << "Parser: " << (double)(end - start)  << "s" << endl;
+#endif
 }
 
 ASTNode* Parser::Parse()

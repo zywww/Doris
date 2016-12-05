@@ -250,6 +250,19 @@ void testMatch()
 	assert(Regex("|a").Match("a") == true);
 	assert(Regex("b{1,}?b").Match("bb") == true);
 	assert(Regex("(a*?)*").Match("aa") == true);
+	assert(Regex("b*?b*").Match("bbb") == true);
+	assert(Regex("b*?b*").Match("") == true);
+	assert(Regex("(b*)\\1").Match("") == true);
+	// assert(Regex("(b*\\1)").Match("") == true); exception
+	// assert(Regex("(()(\\1))").Match("") == true); exception
+	assert(Regex("(()(\\2))").Match("") == true);
+	// assert(Regex("(()(\\3))").Match("") == true); exception
+	assert(Regex("(()()\\2)").Match("") == true);
+	assert(Regex("(()()\\3)").Match("") == true);
+	// assert(Regex("(()()\\1)").Match("") == true); exception
+	// assert(Regex("(?<name>as\\k<name>)").Match("") == true); exception
+	// assert(Regex("^*").Match("")); exception
+	assert(Regex("^$").Match("") == true);
 	//Regex re("\\x21");
 
 	cout << "ÏÂ¶Ïµã" << endl;
@@ -260,9 +273,11 @@ void test()
 	//testLexer();
 	//testParser();
 	//testNFA();
-	Regex re("b{1,}?b");
-	cout << re.Match("bb") << endl;
-
+	/*
+	for (int i = 0; i < 10000; ++i)
+		Regex("^([0369]|([147]|[258][0369]*[258])([147][0369]*[258]|[0369])*[258]|([258]|[147][0369]*[147])([258][0369]*[147]|[0369])*[147])+$");
+	cout << "ok" << endl;
+	*/
 	testMatch();
 	
 	

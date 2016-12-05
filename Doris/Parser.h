@@ -4,6 +4,7 @@
 #include <tuple>	
 #include <string>
 #include <unordered_set>	
+#include <vector>
 #include "Lexer.h"
 #include "AST.h"
 
@@ -54,7 +55,7 @@ private:
 	Token								token_;
 	ASTNode*							astRoot_ = nullptr;
 	int									count_ = 1;
-	std::unordered_set<std::string>		nameReferenceSet_;
+	std::unordered_set<std::string>		referenceSet_;
 	bool								notGreedy_ = false;
 };
 

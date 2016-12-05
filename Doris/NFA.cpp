@@ -11,6 +11,8 @@ using std::cout;
 using std::endl;
 using std::string;
 
+int NFAState::count = 0;
+
 void NFAState::ReverseEdgeOrder()
 {
 	// 调用这个函数时，该状态只有两条出边，调整边的顺序是为了实现非贪婪匹配

@@ -17,11 +17,14 @@ class Automaton;
 class NFAState
 {
 public:
+	static int count;
+	//NFAState() { std::cout << count++ << std::endl; }
 	std::vector<NFAEdge*> inEdge_;
 	std::vector<NFAEdge*> outEdge_;
 	void ReverseEdgeOrder();
 	bool				  accept_ = false;
 };
+
 
 class NFAEdge
 {

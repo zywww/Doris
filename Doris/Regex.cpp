@@ -13,7 +13,7 @@ bool Regex::Match(const string& matchContent)
 {
 	//std::cout << "parser_.notgreedy:" << parser_.GetNotGreedy() << std::endl;
 	auto pair = automaton_.RunNFA(matchContent, 0, true);
-	std::cout << pair.first << " " << pair.second << std::endl;
+	//std::cout << pair.first << " " << pair.second << std::endl;
 	if (pair.second == matchContent.size())	return true;
 	else return false;
 }

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <tuple>	
 #include <cctype>	
+#include <algorithm>
 #include "Parser.h"
 
 using std::cout;
@@ -228,7 +229,10 @@ pair<ASTNode*, bool> Parser::Atom()
 		break;
 
 	case TokenType::BACKREF:
-		if (token_.lexeme_ - '0' >= count_)
+		// 如果该分组还完成捕获或者不存在，则错误
+		//cout << "分组号 " << string() + token_.lexeme_ << endl;
+		//cout << "存在" << referenceSet_.count(string() + token_.lexeme_) << endl;
+		if (!referenceSet_.count(string() + token_.lexeme_))
 			Error("反向引用错误");
 		node = new ASTBackReference(token_.lexeme_ - '0');
 		GetNextToken();
@@ -243,7 +247,7 @@ pair<ASTNode*, bool> Parser::Atom()
 			name = Name();
 			// Name() 遇到 > 才返回来，因此不需要检查
 			GetNextToken();
-			if (!nameReferenceSet_.count(name))
+			if (!referenceSet_.count(name))
 				Error("不可能找到该命名引用");
 			node = new ASTNameReference(name);
 		}
@@ -516,6 +520,7 @@ ASTNode* Parser::UnnameCapture()
 	if (Match(TokenType::RP))
 	{
 		GetNextToken();
+		referenceSet_.insert(std::to_string(count));
 		return new ASTUnnameCapture(new ASTEmpty(), count);
 	}
 
@@ -523,6 +528,7 @@ ASTNode* Parser::UnnameCapture()
 	ASTNode* node = new ASTUnnameCapture(Regex(), count);
 	if (!Match(TokenType::RP))
 		Error("缺少 )");
+	referenceSet_.insert(std::to_string(count));
 	GetNextToken();
 	return node;
 }
@@ -549,12 +555,16 @@ ASTNode* Parser::NotCapture()
 ASTNode* Parser::NameCapture()
 {
 	std::string name = Name(); // Name 遇到 > 就退出
-	nameReferenceSet_.insert(name);
+	
 	GetNextToken();
+	// 只有当内容全部捕获，遇到 ) 才将名字加入集合，
+	// 因为这个时候捕获的内容才可以被引用
+
 
 	// 当 (?<name>) 内为空时
 	if (Match(TokenType::RP))
 	{
+		referenceSet_.insert(name);
 		GetNextToken();
 		return new ASTNameCapture(new ASTEmpty(), name);
 	}
@@ -563,7 +573,9 @@ ASTNode* Parser::NameCapture()
 	ASTNode* node = Regex();
 	if (!Match(TokenType::RP))
 		Error("缺少 )");
+	referenceSet_.insert(name);
 	GetNextToken();
+	
 	return new ASTNameCapture(node, name);
 }
 

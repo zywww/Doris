@@ -11,18 +11,27 @@ using std::cout;
 using std::endl;
 using std::string;
 
-int NFAState::count = 0;
-
+int NFAState::stateCount = 0;
+Automaton* NFAState::automaton = nullptr;
+NFAState::NFAState()
+{
+	automaton->statePool_.push_back(this); 
+	++stateCount; 
+}
 void NFAState::ReverseEdgeOrder()
 {
 	// 调用这个函数时，该状态只有两条出边，调整边的顺序是为了实现非贪婪匹配
 	std::reverse(outEdge_.begin(), outEdge_.end());
 }
 
+int NFAEdge::edgeCount = 0;
+Automaton* NFAEdge::automaton = nullptr;
 // 用友类来实现？？
 NFAEdge::NFAEdge(NFAState* start, NFAState* end) :
 	start_(start), end_(end)
 {
+	automaton->edgePool_.push_back(this);
+	++edgeCount;
 	start_->outEdge_.push_back(this);
 	end_->inEdge_.push_back(this);
 }

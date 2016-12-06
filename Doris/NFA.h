@@ -17,8 +17,10 @@ class NFAStoreEdge;
 class NFAState
 {
 public:
-	static int count;
-	NFAState() { ++count; }
+	static Automaton* automaton;
+	static int stateCount;
+
+	NFAState();
 	void ReverseEdgeOrder();
 
 	std::vector<NFAEdge*> inEdge_;
@@ -30,6 +32,9 @@ public:
 class NFAEdge
 {
 public:
+	static Automaton* automaton;
+	static int edgeCount;
+
 	NFAEdge(NFAState* start, NFAState* end);
 
 	// 用于连接时合并两个状态

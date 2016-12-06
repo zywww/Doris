@@ -13,6 +13,10 @@ Automaton::Automaton(ASTNode* root)
 	start = clock();
 #endif
 
+
+	NFAState::automaton = this;
+	NFAEdge::automaton = this;
+
 	auto pair = root->ConstructNFA();
 	pair.second->accept_ = true;
 	start_ = pair.first;
@@ -23,6 +27,14 @@ Automaton::Automaton(ASTNode* root)
 	std::cout << "gen AST: " << (double)(end - start) << "s" << std::endl;
 #endif
 }
+Automaton::~Automaton()
+{
+	for (auto state : statePool_)
+		delete state;
+	for (auto edge : edgePool_)
+		delete edge;
+}
+
 
 pair<size_t, size_t> Automaton::GetCaptureContent(string name)
 {

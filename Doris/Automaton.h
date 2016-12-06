@@ -14,6 +14,7 @@ class Automaton
 {
 public:
 	Automaton(ASTNode* root);
+	~Automaton();
 
 	std::pair<size_t, size_t>	GetCaptureContent(std::string name);
 	void						PushPair(std::string name, size_t lhs, size_t rhs);
@@ -32,6 +33,8 @@ public:
 	bool					singleLine_ = false;
 	NFAState*				start_ = nullptr;
 	NFAState*				end_ = nullptr;
+	std::vector<NFAState*>	statePool_;
+	std::vector<NFAEdge*>	edgePool_;
 };
 
 

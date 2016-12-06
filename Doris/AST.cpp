@@ -10,7 +10,12 @@ using std::string;
 using std::pair;
 using std::make_pair;
 
+enum class AnchorType;
+
 ASTNode::ASTNode()
+{
+}
+ASTNode::~ASTNode()
 {
 }
 
@@ -22,6 +27,11 @@ pair<NFAState*, NFAState*> ASTNode::ConstructNFA()
 
 ASTOR::ASTOR()
 {
+}
+ASTOR::~ASTOR()
+{
+	for (auto node : nodeVec_)
+		delete node;
 }
 
 void ASTOR::Push(ASTNode* node)
@@ -47,6 +57,11 @@ std::pair<NFAState*, NFAState*> ASTOR::ConstructNFA()
 
 ASTCat::ASTCat()
 {
+}
+ASTCat::~ASTCat()
+{
+	for (auto node : nodeVec_)
+		delete node;
 }
 
 void ASTCat::Push(ASTNode* node)
@@ -80,6 +95,10 @@ std::pair<NFAState*, NFAState*> ASTCat::ConstructNFA()
 ASTRepeat::ASTRepeat(ASTNode* node, bool greedy, int min, int max) :
 	node_(node), greedy_(greedy), min_(min), max_(max)
 {
+}
+ASTRepeat::~ASTRepeat()
+{
+	delete node_;
 }
 
 std::pair<NFAState*, NFAState*> ASTRepeat::ConstructNFA()
@@ -288,6 +307,10 @@ ASTUnnameCapture::ASTUnnameCapture(ASTNode* node, int number) :
 	node_(node), number_(number)
 {
 }
+ASTUnnameCapture::~ASTUnnameCapture()
+{
+	delete node_;
+}
 
 std::pair<NFAState*, NFAState*> ASTUnnameCapture::ConstructNFA()
 {
@@ -314,6 +337,10 @@ ASTNameCapture::ASTNameCapture(ASTNode* node, string name) :
 	node_(node), name_(name)
 {
 }
+ASTNameCapture::~ASTNameCapture()
+{
+	delete node_;
+}
 
 std::pair<NFAState*, NFAState*> ASTNameCapture::ConstructNFA()
 {
@@ -331,6 +358,10 @@ ASTPstLookahead::ASTPstLookahead(ASTNode* node) :
 	node_(node)
 {
 }
+ASTPstLookahead::~ASTPstLookahead()
+{
+	delete node_;
+}
 
 std::pair<NFAState*, NFAState*> ASTPstLookahead::ConstructNFA()
 {
@@ -346,6 +377,10 @@ std::pair<NFAState*, NFAState*> ASTPstLookahead::ConstructNFA()
 ASTNgtLookahead::ASTNgtLookahead(ASTNode* node) :
 	node_(node)
 {
+}
+ASTNgtLookahead::~ASTNgtLookahead()
+{
+	delete node_;
 }
 
 std::pair<NFAState*, NFAState*> ASTNgtLookahead::ConstructNFA()

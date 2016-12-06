@@ -21,7 +21,6 @@ enum class State
 
 Lexer::Lexer(const string &regex) : regex_(regex)
 {
-
 #ifdef DORIS_DEBUG
 	clock_t start = clock(), end;
 	start = clock();
@@ -29,7 +28,6 @@ Lexer::Lexer(const string &regex) : regex_(regex)
 
 	// 因为一个正则表达式和一个 lexer 对应，所以解析放在构造函数中
 	Analyze();
-	canGenDFA_ = isDFA();
 
 #ifdef DORIS_DEBUG
 	end = clock();
@@ -45,22 +43,17 @@ Token Lexer::GetNextToken()
 		return Token(TokenType::END);
 }
 
-Token Lexer::Lookahead()
-{
-	if (tokenIndex_ + 1 < stream_.size())
-		return stream_[tokenIndex_ + 1];
-	else
-		return Token(TokenType::END);
-}
+//Token Lexer::Lookahead()
+//{
+//	if (tokenIndex_ + 1 < stream_.size())
+//		return stream_[tokenIndex_ + 1];
+//	else
+//		return Token(TokenType::END);
+//}
 
 Token Lexer::Backoff()
 {
 	return stream_[--tokenIndex_ - 1];	// 是否需要判断大于 0
-}
-
-bool Lexer::GetIsDFA()
-{
-	return canGenDFA_;
 }
 
 void Lexer::Error(const string &info)
@@ -170,85 +163,85 @@ void Lexer::Analyze()
 		Error("空的转义字符");
 }
 
-bool Lexer::isDFA()
-{
-	for (decltype(stream_.size()) i = 0; i < stream_.size(); ++i)
-	{
-		auto token = stream_[i];
-		switch (token.type_)
-		{
-		case TokenType::BACKREF:	// 含有 \number 的不是纯正则
-		case TokenType::NAMEREF:	// 含有 \k 的不是纯正则
-		case TokenType::BOUND:		// 含有 \b
-		case TokenType::NOT_BOUND:	// 含有 \B
-		case TokenType::DOLLAR:		// 含有 $
-			return false;
-			break;
-		case TokenType::NEGATE:		// 含有 ^ 且 不是 [^] 形式的
-			if (i == 0 || stream_[i - 1].type_ != TokenType::LBRACKET)
-				return false;
-			break;
-			// 这里的 break 没有作用，但是如果以后上面的 return 语句不要了，这个 break 
-			// 就可以明确这里的语意，说明这是一个段落
-		case TokenType::RBRACE:		// 在 } * + ? 后面跟着 ? 表示非贪婪的
-		case TokenType::STAR:
-		case TokenType::PLUS:
-		case TokenType::QUERY:
-			if (i + 1 < stream_.size() && stream_[i + 1].type_ == TokenType::QUERY)
-				return false;
-			break;
-		case TokenType::LP:			// 含有 ( 的且不是 (?: 的都不是纯正则，都属于分组构造
-			if (i + 1 < stream_.size() && i + 2 < stream_.size() &&
-				(stream_[i + 1].type_ != TokenType::QUERY ||
-				stream_[i + 2].lexeme_ != ':'))
-				return false;
-			break;
-		}
-	}
-	return true;
+//bool Lexer::isDFA()
+//{
+//	for (decltype(stream_.size()) i = 0; i < stream_.size(); ++i)
+//	{
+//		auto token = stream_[i];
+//		switch (token.type_)
+//		{
+//		case TokenType::BACKREF:	// 含有 \number 的不是纯正则
+//		case TokenType::NAMEREF:	// 含有 \k 的不是纯正则
+//		case TokenType::BOUND:		// 含有 \b
+//		case TokenType::NOT_BOUND:	// 含有 \B
+//		case TokenType::DOLLAR:		// 含有 $
+//			return false;
+//			break;
+//		case TokenType::NEGATE:		// 含有 ^ 且 不是 [^] 形式的
+//			if (i == 0 || stream_[i - 1].type_ != TokenType::LBRACKET)
+//				return false;
+//			break;
+//			// 这里的 break 没有作用，但是如果以后上面的 return 语句不要了，这个 break 
+//			// 就可以明确这里的语意，说明这是一个段落
+//		case TokenType::RBRACE:		// 在 } * + ? 后面跟着 ? 表示非贪婪的
+//		case TokenType::STAR:
+//		case TokenType::PLUS:
+//		case TokenType::QUERY:
+//			if (i + 1 < stream_.size() && stream_[i + 1].type_ == TokenType::QUERY)
+//				return false;
+//			break;
+//		case TokenType::LP:			// 含有 ( 的且不是 (?: 的都不是纯正则，都属于分组构造
+//			if (i + 1 < stream_.size() && i + 2 < stream_.size() &&
+//				(stream_[i + 1].type_ != TokenType::QUERY ||
+//				stream_[i + 2].lexeme_ != ':'))
+//				return false;
+//			break;
+//		}
+//	}
+//	return true;
+//
+//}
 
-}
+//char* Lexer::DivideCharSet()
+//{
+//	// DFA 才需要，NFA 有功能边
+//	char* table = new char[128];
+//	return table;
+//	/*
+//	vector<pair<char, char>> pvec;
+//	int index = 0;
+//	while (index < stream_.size())
+//	{
+//		auto token = stream_[index];
+//		switch (token.type_)
+//		{
+//		case TokenType::SIMPLECHAR: 
+//			pvec.push_back(std::make_pair(token.lexeme_, token.lexeme_)); 
+//			break;
+//		case TokenType::LBRACKET: 
+//			++index;
+//			while (index < stream_.size() && stream_[index].type_ != TokenType::RBRACKET)
+//			{
+//				switch (stream_[index].type_)
+//				{
+//				case TokenType::WORD: 
+//					pvec.push_back(std::make_pair())
+//				}
+//			}
+//			break;
+//		}
+//
+//	}
+//	*/
+//}
 
-char* Lexer::DivideCharSet()
-{
-	// DFA 才需要，NFA 有功能边
-	char* table = new char[128];
-	return table;
-	/*
-	vector<pair<char, char>> pvec;
-	int index = 0;
-	while (index < stream_.size())
-	{
-		auto token = stream_[index];
-		switch (token.type_)
-		{
-		case TokenType::SIMPLECHAR: 
-			pvec.push_back(std::make_pair(token.lexeme_, token.lexeme_)); 
-			break;
-		case TokenType::LBRACKET: 
-			++index;
-			while (index < stream_.size() && stream_[index].type_ != TokenType::RBRACKET)
-			{
-				switch (stream_[index].type_)
-				{
-				case TokenType::WORD: 
-					pvec.push_back(std::make_pair())
-				}
-			}
-			break;
-		}
-
-	}
-	*/
-}
-
-int Lexer::Number(string::size_type index)
-{
-	long long ans = 0;
-	while (index < regex_.size() && regex_[index] > '0' && regex_[index] < '9')
-	{
-		ans = ans * 10 + regex_[index++] - '0';
-		if (ans > INT_MAX) Error("数字溢出"); 
-	}
-	return ans;
-}
+//int Lexer::Number(string::size_type index)
+//{
+//	long long ans = 0;
+//	while (index < regex_.size() && regex_[index] > '0' && regex_[index] < '9')
+//	{
+//		ans = ans * 10 + regex_[index++] - '0';
+//		if (ans > INT_MAX) Error("数字溢出"); 
+//	}
+//	return ans;
+//}

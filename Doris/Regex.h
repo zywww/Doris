@@ -13,21 +13,17 @@ class Regex
 public:
 	// 可以在构造函数中编译正则表达式，因为一个 regex 类表示一个正则表达式
 	Regex(const std::string &regex);
+	
 
 	bool				Match(const std::string& matchContent);
 	bool				Search(const std::string& searchContent, int startIndex = 0);	// 暂时不用
 	bool				Replace();	// 暂时不用
 
+
 private:
 	const std::string	regex_;
 	Parser				parser_;
 	Automaton			automaton_;
-
-///	bool				isDFA_;
-
-
-///	bool				Parse();
-///	std::pair<int, int>	Find(int begin, const std::string &matchContent, bool match); 
 };
 
 #endif 

@@ -1,8 +1,6 @@
 #ifndef DORIS_NFA_H__
 #define DORIS_NFA_H__
 
-//enum class AnchorType { BEGIN, END, BOUND, NOT_BOUND };
-
 #include <vector>
 #include <string>
 #include <utility>
@@ -11,17 +9,20 @@
 enum class AnchorType;
 class NFAEdge;
 class Automaton;
-
-
+class NFAExitEdge;
+class NFARepeatEdge;
+class NFASetRepeatEdge;
+class NFAStoreEdge;
 
 class NFAState
 {
 public:
 	static int count;
-	//NFAState() { std::cout << count++ << std::endl; }
+	NFAState() { ++count; }
+	void ReverseEdgeOrder();
+
 	std::vector<NFAEdge*> inEdge_;
 	std::vector<NFAEdge*> outEdge_;
-	void ReverseEdgeOrder();
 	bool				  accept_ = false;
 };
 
@@ -31,14 +32,15 @@ class NFAEdge
 public:
 	NFAEdge(NFAState* start, NFAState* end);
 
-	void ChangeStartState(NFAState* newStart);
+	// 用于连接时合并两个状态
+	void		 ChangeStartState(NFAState* newStart);
 	virtual bool Pass(Automaton* automaton, const std::string& content, 
 		std::string::size_type &index);
 
-//private:
 	NFAState*	start_;
 	NFAState*	end_;
 };
+
 
 class NFAMatchEdge : public NFAEdge
 {
@@ -48,9 +50,9 @@ public:
 	bool Pass(Automaton* automaton, const std::string& content,
 		std::string::size_type &index);
 
-private:
 	char ch_;
 };
+
 
 class NFAEmptyEdge : public NFAEdge
 {
@@ -61,9 +63,6 @@ public:
 		std::string::size_type &index);
 };
 
-class NFAExitEdge;
-class NFARepeatEdge;
-class NFASetRepeatEdge;
 
 class NFAStartRepeatEdge : public NFAEdge
 {
@@ -72,7 +71,6 @@ public:
 
 	bool Pass(Automaton* automaton, const std::string& content,
 		std::string::size_type &index);
-
 	void SetEdges(NFASetRepeatEdge* set, NFARepeatEdge* repeat, NFAExitEdge* exit);
 
 	int min_;
@@ -82,6 +80,7 @@ public:
 	NFAExitEdge*		exitEdge_;
 };
 
+
 class NFASetRepeatEdge : public NFAEdge
 {
 public:
@@ -89,7 +88,6 @@ public:
 
 	bool Pass(Automaton* automaton, const std::string& content,
 		std::string::size_type &index);
-
 	void SetEdges(NFARepeatEdge* repeat, NFAExitEdge* exit);
 
 	int min_;
@@ -99,6 +97,7 @@ public:
 	NFARepeatEdge*	repeatEdge_;
 	NFAExitEdge*	exitEdge_;
 };
+
 
 class NFARepeatEdge : public NFAEdge
 {
@@ -111,6 +110,7 @@ public:
 	bool pass_;
 };
 
+
 class NFAExitEdge : public NFAEdge
 {
 public:
@@ -122,6 +122,7 @@ public:
 	bool pass_;
 };
 
+
 class NFARangeEdge : public NFAEdge
 {
 public:
@@ -130,10 +131,10 @@ public:
 	bool Pass(Automaton* automaton, const std::string& content,
 		std::string::size_type &index);
 
-private:
 	char lhs_;
 	char rhs_;
 };
+
 
 class NFAReferenceEdge : public NFAEdge
 {
@@ -143,9 +144,9 @@ public:
 	bool Pass(Automaton* automaton, const std::string& content,
 		std::string::size_type &index);
 
-private:
 	std::string name_;
 };
+
 
 class NFAAnchorEdge : public NFAEdge
 {
@@ -155,11 +156,9 @@ public:
 	bool Pass(Automaton* automaton, const std::string& content,
 		std::string::size_type &index);
 
-private:
 	AnchorType type_;
 };
 
-class NFAStoreEdge;
 
 class NFAStartEdge : public NFAEdge	
 {
@@ -169,9 +168,9 @@ public:
 	bool Pass(Automaton* automaton, const std::string& content,
 		std::string::size_type &index);
 
-private:
 	NFAStoreEdge* storeEdge_;
 };
+
 
 class NFAStoreEdge : public NFAEdge
 {
@@ -182,10 +181,8 @@ public:
 		std::string::size_type &index);
 	void SetLhs(int lhs);
 
-private:
 	std::string name_;
 	int			lhs_;
-	//int			rhs_;
 };
 
 class NFALookaheadEdge : public NFAEdge
@@ -197,15 +194,9 @@ public:
 	bool Pass(Automaton* automaton, const std::string& content,
 		std::string::size_type &index);
 
-private:
 	bool negate_;
 	NFAState* lookaheadStart_;
 	NFAState* lookaheadEnd_;
 };
-
-
-// NFA 回溯时可能需要 reset 一些东西，别如捕获的内容，还有计数边？
-std::pair<int, int> RunNFA(int *charClass, NFAState *start, NFAState *end,
-	const std::string input);
 
 #endif

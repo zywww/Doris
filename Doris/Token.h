@@ -3,12 +3,11 @@
 
 // 如果两个符号有不同语义，则应该给他设计一种 token
 // 应该把 (?: (?= (?! \k<name> 等等分析为一个词法单元吗？看看别的实现
-//
 enum class TokenType
 {
 	SIMPLECHAR,		// 即用来匹配的ASCII字符
-//	NUMBER,			// {min, max} 中的数字
-//	WIDECHAR,		// 宽字符
+///	NUMBER,			// {min, max} 中的数字
+///	WIDECHAR,		// 宽字符
 
 	OR,				// |
 	STAR,			// *
@@ -25,7 +24,6 @@ enum class TokenType
 	LANGLE,			// <
 	RANGLE,			// >
 	ANY,			// . 通配符 与除 \n 之外的任何单个字符匹配。
-//	BACKSLASH,		// \ 反斜杠
 	MINUS,			// - 连字符	若在 [] 外，则 MINUS 和 simplechar 的 '-' 是同语义的
 
 	WORD,			// \w  ==  [a-zA-Z0-9_]

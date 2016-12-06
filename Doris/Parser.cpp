@@ -30,6 +30,11 @@ Parser::Parser(const string &regex) :
 #endif
 }
 
+Parser::~Parser()
+{
+	delete astRoot_;
+}
+
 ASTNode* Parser::Parse()
 {
 	if (Match(TokenType::END))
@@ -50,10 +55,10 @@ ASTNode* Parser::GetASTRoot()
 	return astRoot_;
 }
 
-bool Parser::GetNotGreedy()
-{
-	return notGreedy_;
-}
+//bool Parser::GetNotGreedy()
+//{
+//	return notGreedy_;
+//}
 
 void Parser::Error(const string &info)
 {
@@ -399,7 +404,7 @@ std::tuple<bool, int, int>	Parser::Repeat()
 		}
 	}
 
-	notGreedy_ = !greedy;
+	/// notGreedy_ = !greedy;
 	return	std::make_tuple(greedy, min, max);
 }
 

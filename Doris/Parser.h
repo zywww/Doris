@@ -12,12 +12,11 @@ class Parser
 {
 public:
 	Parser(const std::string &regex);
+	~Parser();
 
 	// 对正则表达式进行语法分析，若成功则返回 AST 根结点
 	ASTNode*							Parse();			
-///	bool								isDFA();
 	ASTNode*							GetASTRoot();
-	bool								GetNotGreedy();
 
 private:
 	// 语法错误
@@ -26,7 +25,6 @@ private:
 	void								GetNextToken();	
 	// 回退一个词法单元
 	void								Backoff();
-	
 	// 检查当前词法单元是否是 简单字符 ch
 	bool								Match(char ch);
 	// 检查当前词法单元是否是 某类型元字符
@@ -56,7 +54,6 @@ private:
 	ASTNode*							astRoot_ = nullptr;
 	int									count_ = 1;
 	std::unordered_set<std::string>		referenceSet_;
-	bool								notGreedy_ = false;
 };
 
 #endif 

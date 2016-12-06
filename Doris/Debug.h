@@ -2,7 +2,8 @@
 #define DORIS_DEBUG_H__
 
 #include <ctime>
-#define DORIS_DEBUG
+#define DORIS_TOTAL_DEBUG
+//#define DORIS_DEBUG
 
 
 #endif 

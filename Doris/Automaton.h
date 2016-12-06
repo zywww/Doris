@@ -25,9 +25,6 @@ public:
 	int					DFSNFA(NFAState* start, const std::string& content, int startIndex = 0,
 		bool matchNotGreedy = false);
 
-	
-	//const std::string&		regex = std::string();
-	//std::string::size_type	index;
 
 	// 匿名和命名捕获的内容都存放在这里
 	// name begin, end

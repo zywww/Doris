@@ -277,16 +277,16 @@ void test()
 	//testNFA();
 
 
-#ifdef DORIS_DEBUG
+#ifdef DORIS_TOTAL_DEBUG
 	clock_t start = clock(), end;
 	start = clock();
 #endif
 	
-//	for (int i = 0; i < 10000; ++i)
-	Regex("^([0369]|([147]|[258][0369]*[258])([147][0369]*[258]|[0369])*[258]|([258]|[147][0369]*[147])([258][0369]*[147]|[0369])*[147])+$").Match("1234561894718975917089175155417556428635789312756891735987195794789532414564695871895");
+	for (int i = 0; i < 10000; ++i)
+		Regex("^([0369]|([147]|[258][0369]*[258])([147][0369]*[258]|[0369])*[258]|([258]|[147][0369]*[147])([258][0369]*[147]|[0369])*[147])+$");
 	//cout << "ok" << endl;
 	
-#ifdef DORIS_DEBUG
+#ifdef DORIS_TOTAL_DEBUG
 		end = clock();
 		cout << "Total: " << (double)(end - start) << "s" << endl;
 #endif

@@ -1,56 +1,62 @@
 #ifndef DORIS_AST_H__
 #define DORIS_AST_H__
 
-enum class AnchorType { BEGIN, END, BOUND, NOT_BOUND };
+
 
 #include <tuple>
 #include <utility>
 #include <vector>
 #include <string>
-///#include "DFA.h"	
-//#include "NFA.h"
 
 class NFAState;
-
-
+enum class AnchorType { BEGIN, END, BOUND, NOT_BOUND };
 
 // TODO 实现成抽象类？？
 class ASTNode
 {
 public:
 	ASTNode();
+	virtual ~ASTNode();
 
 	virtual std::pair<NFAState*, NFAState*> ConstructNFA();
 };
+
 
 class ASTOR : public ASTNode
 {
 public:
 	ASTOR();
+	~ASTOR();
 
-	void Push(ASTNode* node);
+	// 将 并 的子节点存进来
+	void							Push(ASTNode* node);
 	std::pair<NFAState*, NFAState*> ConstructNFA();
 
 private:
 	std::vector<ASTNode*> nodeVec_;
 };
+
 
 class ASTCat : public ASTNode
 {
 public:
 	ASTCat();
+	~ASTCat();
 
-	void Push(ASTNode* node);
+	// 将 连接 的子节点存进来
+	void							Push(ASTNode* node);
 	std::pair<NFAState*, NFAState*> ConstructNFA();
 
 private:
 	std::vector<ASTNode*> nodeVec_;
 };
 
+
 class ASTRepeat : public ASTNode
 {
 public:
 	ASTRepeat(ASTNode* node, bool greedy, int min, int max);
+	~ASTRepeat();
 
 	std::pair<NFAState*, NFAState*> ConstructNFA();
 
@@ -61,19 +67,21 @@ private:
 	int			max_;
 };
 
+
 class ASTCharClass : public ASTNode
 {
 public:
 	ASTCharClass(bool negate);
 
-	void Push(char begin, char end);
-	// charclass 在生成 nfa 时，重新生成最简范围
+	// 将一系列的字符集添加进来
+	void							Push(char begin, char end);
 	std::pair<NFAState*, NFAState*> ConstructNFA();
 
 private:
 	std::vector<std::pair<char, char>> ranges_;
 	bool negate_;
 };
+
 
 class ASTEmpty : public ASTNode
 {
@@ -82,6 +90,7 @@ public:
 
 	std::pair<NFAState*, NFAState*> ConstructNFA();
 };
+
 
 class ASTCharacter : public ASTNode
 {
@@ -94,6 +103,7 @@ private:
 	char ch_;
 };
 
+
 class ASTBackReference : public ASTNode
 {
 public: 
@@ -104,6 +114,7 @@ public:
 private:
 	int number_; // 表示 \number 
 };
+
 
 class ASTNameReference : public ASTNode
 {
@@ -117,6 +128,7 @@ private:
 };
 
 
+
 class ASTAnchor : public ASTNode
 {
 public:
@@ -128,10 +140,12 @@ private:
 	AnchorType type_;
 };
 
+
 class ASTUnnameCapture : public ASTNode
 {
 public:
 	ASTUnnameCapture(ASTNode* node, int number);
+	~ASTUnnameCapture();
 
 	std::pair<NFAState*, NFAState*> ConstructNFA();
 
@@ -140,10 +154,12 @@ private:
 	int			number_;	// 匿名捕获的标号
 };
 
+
 class ASTNameCapture : public ASTNode
 {
 public:
 	ASTNameCapture(ASTNode* node, std::string name);
+	~ASTNameCapture();
 
 	std::pair<NFAState*, NFAState*> ConstructNFA();
 
@@ -152,11 +168,13 @@ private:
 	std::string name_;
 };
 
+
 // positive lookahead
 class ASTPstLookahead : public ASTNode
 {
 public:
 	ASTPstLookahead(ASTNode* node);
+	~ASTPstLookahead();
 
 	std::pair<NFAState*, NFAState*> ConstructNFA();
 
@@ -164,11 +182,13 @@ private:
 	ASTNode*	node_;
 };
 
+
 // negative lookahead
 class ASTNgtLookahead : public ASTNode
 {
 public:
 	ASTNgtLookahead(ASTNode* node);
+	~ASTNgtLookahead();
 
 	std::pair<NFAState*, NFAState*> ConstructNFA();
 

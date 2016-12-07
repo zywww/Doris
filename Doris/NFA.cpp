@@ -3,6 +3,7 @@
 #include <iostream>	
 #include <cctype>
 #include <algorithm>	
+#include <vector>
 #include "NFA.h"
 #include "Automaton.h"
 #include "AST.h"
@@ -10,6 +11,8 @@
 using std::cout;
 using std::endl;
 using std::string;
+using std::vector;
+using std::pair;
 
 int NFAState::stateCount = 0;
 Automaton* NFAState::automaton = nullptr;
@@ -39,6 +42,13 @@ NFAEdge::NFAEdge(NFAState* start, NFAState* end) :
 void NFAEdge::ChangeStartState(NFAState* newStart)
 {
 	start_ = newStart;
+	newStart->outEdge_.push_back(this);
+}
+
+void NFAEdge::ChangeEndState(NFAState* newEnd)
+{
+	end_ = newEnd;
+	newEnd->inEdge_.push_back(this);
 }
 
 bool NFAEdge::Pass(Automaton* automaton, const std::string& content,
@@ -190,6 +200,33 @@ bool NFARangeEdge::Pass(Automaton* automaton, const std::string& content,
 		return true;
 	else
 		return false;
+}
+
+
+
+NFACharClassEdge::NFACharClassEdge(NFAState* start, NFAState* end) :
+	NFAEdge(start, end)
+{
+}
+
+void NFACharClassEdge::SetRanges(const vector<pair<char, char>> &ranges)
+{
+	ranges_ = ranges;
+}
+
+bool NFACharClassEdge::Pass(Automaton* automaton, const std::string& content,
+	std::string::size_type &index)
+{
+	if (index >= content.size()) return false;
+	auto tempIndex = index++;
+	for (auto range : ranges_)
+	{
+		//cout << "range: " << range.first << " " << range.second << " match " << content[tempIndex] << endl;
+		if (range.first <= content[tempIndex] && content[tempIndex] <= range.second)
+			return true;
+	}
+		
+	return false;
 }
 
 

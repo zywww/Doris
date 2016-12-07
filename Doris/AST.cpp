@@ -41,16 +41,30 @@ void ASTOR::Push(ASTNode* node)
 
 std::pair<NFAState*, NFAState*> ASTOR::ConstructNFA()
 {
-	assert(nodeVec_.size() != 0);
 	if (nodeVec_.size() == 1) return nodeVec_[0]->ConstructNFA();
 	NFAState* start = new NFAState;
 	NFAState* end = new NFAState;
+
+	// 旧的 或运算 的构造方法，空边是多余的
+	/*
 	for (auto node : nodeVec_)
 	{
 		auto pair = node->ConstructNFA();
 		new NFAEmptyEdge(start, pair.first);
 		new NFAEmptyEdge(pair.second, end);
 	}
+	*/
+	
+	for (auto node : nodeVec_)
+	{
+		auto pair = node->ConstructNFA();
+		for (auto edge : pair.first->outEdge_)
+			edge->ChangeStartState(start);
+			
+		for (auto edge : pair.second->inEdge_)
+			edge->ChangeEndState(end);	
+	}
+	
 	return make_pair(start, end);
 }
 
@@ -83,7 +97,7 @@ std::pair<NFAState*, NFAState*> ASTCat::ConstructNFA()
 		for (auto outEdge : tempPair.first->outEdge_)
 		{
 			outEdge->ChangeStartState(end);
-			end->outEdge_.push_back(outEdge);
+			//end->outEdge_.push_back(outEdge);
 		}
 			
 		// delete tempPair.first; // 释放内存？
@@ -213,6 +227,9 @@ std::pair<NFAState*, NFAState*> ASTCharClass::ConstructNFA()
 
 	auto start = new NFAState;
 	auto end = new NFAState;
+
+	// 旧的做法，将字符集化作为多个区间边
+	/*
 	if (newRange.size() == 1)
 		new NFARangeEdge(start, end, newRange[0].first, newRange[0].second);
 	else
@@ -226,6 +243,11 @@ std::pair<NFAState*, NFAState*> ASTCharClass::ConstructNFA()
 			new NFARangeEdge(tempStart, tempEnd, pair.first, pair.second);
 		}
 	}
+	*/
+	
+	// 优化的做法，化作一条边
+	auto charclassEdge = new NFACharClassEdge(start, end);
+	charclassEdge->SetRanges(newRange);
 
 	return make_pair(start, end);
 }

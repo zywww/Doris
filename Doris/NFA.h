@@ -39,6 +39,7 @@ public:
 
 	// 用于连接时合并两个状态
 	void		 ChangeStartState(NFAState* newStart);
+	void		 ChangeEndState(NFAState* newEnd);
 	virtual bool Pass(Automaton* automaton, const std::string& content, 
 		std::string::size_type &index);
 
@@ -138,6 +139,18 @@ public:
 
 	char lhs_;
 	char rhs_;
+};
+
+class NFACharClassEdge : public NFAEdge
+{
+public:
+	NFACharClassEdge(NFAState* start, NFAState* end);
+
+	void SetRanges(const std::vector<std::pair<char, char>> &range);
+	bool Pass(Automaton* automaton, const std::string& content,
+			std::string::size_type &index);
+
+	std::vector<std::pair<char, char>> ranges_;
 };
 
 

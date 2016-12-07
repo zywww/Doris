@@ -16,7 +16,7 @@ public:
 	
 
 	bool				Match(const std::string& matchContent);
-	bool				Search(const std::string& searchContent, int startIndex = 0);	// 暂时不用
+	std::pair<int, int>	Search(const std::string& searchContent, int startIndex = 0);	// 暂时不用
 	bool				Replace();	// 暂时不用
 
 

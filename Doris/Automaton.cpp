@@ -24,7 +24,7 @@ Automaton::Automaton(ASTNode* root)
 
 #ifdef DORIS_DEBUG
 	end = clock();
-	std::cout << "gen AST: " << (double)(end - start) << "s" << std::endl;
+	std::cout << "gen NFA: " << (double)(end - start) << "s" << std::endl;
 #endif
 }
 Automaton::~Automaton()

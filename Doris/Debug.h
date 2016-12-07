@@ -3,8 +3,8 @@
 
 #include <ctime>
 #define DORIS_TOTAL_DEBUG
-//#define DORIS_DEBUG
-//#define DORIS_COUNT
+#define DORIS_DEBUG
+#define DORIS_COUNT
 
 
 #endif 

@@ -130,13 +130,21 @@ NFASetRepeatEdge::NFASetRepeatEdge(NFAState* start, NFAState* end) :
 bool NFASetRepeatEdge::Pass(Automaton* automaton, const std::string& content,
 	std::string::size_type &index)
 {
+	// 如果 max_ 不等于 -1 或者 0 则减少一次
+	// max_ = max_ > 0 ? max_ - 1 : max_;
 	if (max_ > 0) --max_;
+	
 	// min_ 减到为 0 就不需要再减了，且 min_ 的初始化不可能为负数
+	//min_ = min_ > 0 ? min_ - 1 : min_;
 	if (min_ > 0) --min_;
 
+
 	// 循环已经达到最低要求
+	//exitEdge_->pass_ = min_ ? exitEdge_->pass_ : true;
+	
 	if (!min_)
 		exitEdge_->pass_ = true;
+	
 
 	// 如果循环无上限并且该次循环匹配内容为空，则不允许再次循环，因为下次循环依然为空
 	// 会造成匹配空内容并且无限循环，但是如果是有限次数的，则可以多次匹配空内容
@@ -178,11 +186,6 @@ NFAExitEdge::NFAExitEdge(NFAState* start, NFAState*end) :
 bool NFAExitEdge::Pass(Automaton* automaton, const std::string& content,
 	std::string::size_type &index)
 {
-	/*
-	repeatEdge_->min_ = min_;
-	repeatEdge_->max_ = max_;
-	return canExit;
-	*/
 	return pass_;
 }
 

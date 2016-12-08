@@ -1,10 +1,11 @@
+#include "Debug.h"
 #include <iostream>
 #include <tuple>	
 #include <cctype>	
 #include <algorithm>
 #include <ctime>
 #include "Parser.h"
-#include "Debug.h"
+
 
 using std::cout;
 using std::endl;
@@ -19,6 +20,7 @@ Parser::Parser(const string &regex) :
 	clock_t start = clock(), end;
 	start = clock();
 #endif
+
 
 	GetNextToken();
 	astRoot_ = Parse();
@@ -44,21 +46,11 @@ ASTNode* Parser::Parse()
 		Error("表达式错误");
 	return root;
 }
-/*
-bool Parser::isDFA() 
-{
-	return lexer_.GetIsDFA(); 
-}
-*/
+
 ASTNode* Parser::GetASTRoot()
 {
 	return astRoot_;
 }
-
-//bool Parser::GetNotGreedy()
-//{
-//	return notGreedy_;
-//}
 
 void Parser::Error(const string &info)
 {
@@ -150,6 +142,7 @@ pair<ASTNode*, bool> Parser::Atom()
 	ASTNode* node = nullptr;
 	ASTCharClass* temp = nullptr;
 	bool repeat = true;
+
 	switch (token_.type_)
 	{
 	case TokenType::SIMPLECHAR:
@@ -187,6 +180,7 @@ pair<ASTNode*, bool> Parser::Atom()
 		repeat = false;
 		GetNextToken();
 		break;
+
 		// TODO 此处代码重复，可以简化
 	case TokenType::WORD:
 		temp = new ASTCharClass(false);
@@ -247,9 +241,7 @@ pair<ASTNode*, bool> Parser::Atom()
 		break;
 
 	case TokenType::BACKREF:
-		// 如果该分组还完成捕获或者不存在，则错误
-		//cout << "分组号 " << string() + token_.lexeme_ << endl;
-		//cout << "存在" << referenceSet_.count(string() + token_.lexeme_) << endl;
+		// 如果该分组还未捕获或者不存在，则错误
 		if (!referenceSet_.count(string() + token_.lexeme_))
 			Error("反向引用错误");
 		node = new ASTBackReference(token_.lexeme_ - '0');
@@ -311,14 +303,12 @@ pair<ASTNode*, bool> Parser::Atom()
 		else
 			node = UnnameCapture();
 		break;
-	default: // 改成错误？？
-		/*
-		node = new ASTEmpty();
-		repeat = true;
-		*/
+
+	default: 
 		Error("因子错误");
 		break;
 	}
+
 	return std::make_pair(node, repeat);
 }
 
@@ -327,6 +317,7 @@ std::tuple<bool, int, int>	Parser::Repeat()
 {
 	bool greedy = true;
 	int min, max;
+
 	switch (token_.type_)
 	{
 	case TokenType::STAR:
@@ -404,7 +395,6 @@ std::tuple<bool, int, int>	Parser::Repeat()
 		}
 	}
 
-	/// notGreedy_ = !greedy;
 	return	std::make_tuple(greedy, min, max);
 }
 
@@ -425,6 +415,7 @@ ASTNode* Parser::Charclass()
 	{
 		char lhs;
 		bool range = false;
+
 		switch (token_.type_)
 		{
 		case TokenType::SIMPLECHAR:
@@ -497,8 +488,8 @@ ASTNode* Parser::Charclass()
 
 		default: 
 			Error("[ ] 内错误的词法单元");
-
 		}
+
 		if (!range)
 		{
 			GetNextToken();
@@ -534,6 +525,7 @@ ASTNode* Parser::Charclass()
 ASTNode* Parser::UnnameCapture()
 {
 	int count = count_++;
+
 	// 当 () 内为空时
 	if (Match(TokenType::RP))
 	{
@@ -548,6 +540,7 @@ ASTNode* Parser::UnnameCapture()
 		Error("缺少 )");
 	referenceSet_.insert(std::to_string(count));
 	GetNextToken();
+
 	return node;
 }
 
@@ -566,6 +559,7 @@ ASTNode* Parser::NotCapture()
 	if (!Match(TokenType::RP))
 		Error("缺少 )");
 	GetNextToken();
+
 	return node;
 }
 
@@ -577,7 +571,6 @@ ASTNode* Parser::NameCapture()
 	GetNextToken();
 	// 只有当内容全部捕获，遇到 ) 才将名字加入集合，
 	// 因为这个时候捕获的内容才可以被引用
-
 
 	// 当 (?<name>) 内为空时
 	if (Match(TokenType::RP))
@@ -603,9 +596,9 @@ ASTNode* Parser::PositiveLookahead()
 	// 当 (?=) 为空时，该边一定通过
 	if (Match(TokenType::RP))
 	{
-		//GetNextToken();
-		//return new ASTEmpty();
-		Error("预查子表达式不能为空");
+		GetNextToken();
+		return new ASTEmpty();
+		// return new ASTPstLookahead(new ASTEmpty());
 	}
 
 	// 当 (?=) 不为空时
@@ -621,7 +614,11 @@ ASTNode* Parser::NegativeLookahead()
 {
 	// 当 (?!) 内为空时
 	if (Match(TokenType::RP))
-		Error("预查子表达式不能为空");
+	{
+		GetNextToken();
+		return new ASTNgtLookahead(new ASTEmpty());
+	}
+		
 
 	// 当 (?!) 不为空时
 	ASTNode* node = Regex();
@@ -635,6 +632,7 @@ ASTNode* Parser::NegativeLookahead()
 int Parser::Number()
 {
 	long long ans = 0;
+
 	while (std::isdigit(token_.lexeme_))
 	{
 		ans = ans * 10 + (token_.lexeme_ - '0');
@@ -642,7 +640,8 @@ int Parser::Number()
 			Error("数字溢出");
 		GetNextToken();
 	}
-	return ans;
+
+	return static_cast<int>(ans);
 }
 
 string Parser::Name()
@@ -650,6 +649,7 @@ string Parser::Name()
 	string ans;
 	if (std::isdigit(token_.lexeme_))
 		Error("名称不能以数字开头");
+
 	while (!Match(TokenType::RANGLE))
 	{
 		if (!Match(TokenType::SIMPLECHAR))
@@ -660,8 +660,10 @@ string Parser::Name()
 			Error("<> 内的名称应该为合法的标识符");
 		GetNextToken();
 	}
+
 	if (ans.empty())
 		Error("命名不能为空");
+
 	return ans;
 }
 

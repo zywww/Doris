@@ -1,3 +1,4 @@
+#include "Debug.h"
 #include <cassert>
 #include <iostream>
 #include <regex>
@@ -5,7 +6,7 @@
 #include <utility>
 #include <ctime>
 #include "Lexer.h"
-#include "Debug.h"
+
 
 using std::cout;
 using std::endl;
@@ -25,13 +26,13 @@ Lexer::Lexer(const string &regex) : regex_(regex)
 	clock_t start = clock(), end;
 	start = clock();
 #endif
-
+	
 	// 因为一个正则表达式和一个 lexer 对应，所以解析放在构造函数中
 	Analyze();
 
 #ifdef DORIS_DEBUG
 	end = clock();
-	cout << "Lexer: " << (double)(end - start) << "s" << endl;
+	cout << "Lexer: " << (double)(end - start) << "ms" << endl;
 #endif
 }
 
@@ -43,17 +44,10 @@ Token Lexer::GetNextToken()
 		return Token(TokenType::END);
 }
 
-//Token Lexer::Lookahead()
-//{
-//	if (tokenIndex_ + 1 < stream_.size())
-//		return stream_[tokenIndex_ + 1];
-//	else
-//		return Token(TokenType::END);
-//}
-
 Token Lexer::Backoff()
 {
-	return stream_[--tokenIndex_ - 1];	// 是否需要判断大于 0
+	// Parser 只会在确定的情况下使用该函数，所以不需要判断 tokenIndex 的合法性
+	return stream_[--tokenIndex_ - 1];	
 }
 
 void Lexer::Error(const string &info)
@@ -62,11 +56,11 @@ void Lexer::Error(const string &info)
 	throw info;
 }
 
-// 在 [ ] 内的词法单元进行不同的词法分析，比如 - 分析为 simplechar
 void Lexer::Analyze()
 {
 	State state = State::START;
 	string::size_type index = 0;
+
 	// 将词法单元存进 stream_
 	auto push = [&](TokenType type, char ch = '\0') -> void
 	{
@@ -74,6 +68,7 @@ void Lexer::Analyze()
 		++index;
 		state = State::START;
 	};
+
 	// 计算两位十六进制值，若不合法，返回 -1
 	auto getHexVal = [](char ch1, char ch2) -> char
 	{
@@ -90,6 +85,7 @@ void Lexer::Analyze()
 
 		return ans;
 	};
+
 	while (index < regex_.size())
 	{
 		char ch = regex_[index];
@@ -149,6 +145,7 @@ void Lexer::Analyze()
 				else
 					Error("\\x 后面的十六进制字符不合法");
 				break;
+
 			default: 
 				if (ch >= '1' && ch <= '9')
 					push(TokenType::BACKREF, ch);	// 保存为数字字符
@@ -200,48 +197,4 @@ void Lexer::Analyze()
 //	}
 //	return true;
 //
-//}
-
-//char* Lexer::DivideCharSet()
-//{
-//	// DFA 才需要，NFA 有功能边
-//	char* table = new char[128];
-//	return table;
-//	/*
-//	vector<pair<char, char>> pvec;
-//	int index = 0;
-//	while (index < stream_.size())
-//	{
-//		auto token = stream_[index];
-//		switch (token.type_)
-//		{
-//		case TokenType::SIMPLECHAR: 
-//			pvec.push_back(std::make_pair(token.lexeme_, token.lexeme_)); 
-//			break;
-//		case TokenType::LBRACKET: 
-//			++index;
-//			while (index < stream_.size() && stream_[index].type_ != TokenType::RBRACKET)
-//			{
-//				switch (stream_[index].type_)
-//				{
-//				case TokenType::WORD: 
-//					pvec.push_back(std::make_pair())
-//				}
-//			}
-//			break;
-//		}
-//
-//	}
-//	*/
-//}
-
-//int Lexer::Number(string::size_type index)
-//{
-//	long long ans = 0;
-//	while (index < regex_.size() && regex_[index] > '0' && regex_[index] < '9')
-//	{
-//		ans = ans * 10 + regex_[index++] - '0';
-//		if (ans > INT_MAX) Error("数字溢出"); 
-//	}
-//	return ans;
 //}

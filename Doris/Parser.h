@@ -13,13 +13,11 @@ class Parser
 public:
 	Parser(const std::string &regex);
 	~Parser();
-
-	// 对正则表达式进行语法分析，若成功则返回 AST 根结点
-	ASTNode*							Parse();			
+			
 	ASTNode*							GetASTRoot();
 
 private:
-	// 语法错误
+	// 语法错误，打印错误信息，并抛出异常
 	void								Error(const std::string &info);			
 	// 获取下个词法单元
 	void								GetNextToken();	
@@ -30,6 +28,9 @@ private:
 	// 检查当前词法单元是否是 某类型元字符
 	bool								Match(TokenType type);
 
+	// 对正则表达式进行语法分析，若成功则返回 AST 根结点
+	ASTNode*							Parse();
+
 	// 递归下降的语法分析
 	ASTNode*							Regex();
 	ASTNode*							Term();
@@ -38,7 +39,6 @@ private:
 	std::pair<ASTNode*, bool>			Atom();
 	// 返回重复的次数 min, max 和 是否贪婪重复
 	std::tuple<bool, int, int>			Repeat();			
-	// TODO charclass 应该分出来一个函数判断范围
 	ASTNode*							Charclass();
 	ASTNode*							UnnameCapture();
 	ASTNode*							NameCapture();

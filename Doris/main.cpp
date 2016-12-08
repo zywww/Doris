@@ -1,3 +1,5 @@
+#include "Debug.h"
+#include <crtdbg.h>
 #include <iostream>	
 #include <cstdlib>
 #include <string>
@@ -8,7 +10,7 @@
 #include "Lexer.h"
 #include "Parser.h"
 #include "Regex.h"
-#include "Debug.h"
+
 
 using std::string;
 using std::endl;
@@ -299,7 +301,7 @@ void testTime()
 
 #ifdef DORIS_TOTAL_DEBUG
 	end = clock();
-	cout << "Total: " << (double)(end - start) << "s" << endl;
+	cout << "Total: " << (double)(end - start) << "ms" << endl;
 #endif
 #ifdef DORIS_COUNT
 	cout << "state count " << NFAState::stateCount << endl;
@@ -314,19 +316,43 @@ void test()
 	//testParser();
 	//testNFA();
 	//testMatch();
-	testTime();
+	//testTime();
+	
+	
+	
+	Regex re("()");
+
+	/*assert(Regex("(a*)*").Match("aaaa") == true);
+	assert(Regex("(a*)*|bbb").Match("bbb") == true);
+	assert(Regex("[ab]*").Match("bbb") == true);
+	assert(Regex("([ab]*)").Match("bbb") == true);
+	assert(Regex("a+").Match("") == false);
+	assert(Regex("a+").Match("a") == true);
+	assert(Regex("a+").Match("aaa") == true);
+	assert(Regex("a?").Match("aaa") == false);
+	assert(Regex("a?").Match("a") == true);
+	assert(Regex("a?").Match("") == true);*/
+	
 	
 
+
+	// TODO 将 dfs 改成非递归
+	// TODO 剪枝函数，遍历一遍，确定每个状态所需剩余的字符个数
+	// TODO 用函数检测内存泄漏
+	// TODO 应该把 (?: (?= (?! \k<name> 等等分析为一个词法单元吗？看看别的实现
+	// TODO 将函数内联
+	//std::vector<int> ivec(8000000);
 	
 	cout << "断点" << endl;
 }
 
 int main()
 {
+	//_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
+	//_CrtSetBreakAlloc(248);
 	test();
-
 	
-
+	_CrtDumpMemoryLeaks();
 	system("pause");
 	return 0;
 }

@@ -12,7 +12,7 @@ Automaton::Automaton(ASTNode* root)
 	clock_t start = clock(), end;
 	start = clock();
 #endif
-
+	
 
 	NFAState::automaton = this;
 	NFAEdge::automaton = this;

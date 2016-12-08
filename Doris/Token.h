@@ -2,13 +2,10 @@
 #define DORIS_TOKEN_H__
 
 // 如果两个符号有不同语义，则应该给他设计一种 token
-// 应该把 (?: (?= (?! \k<name> 等等分析为一个词法单元吗？看看别的实现
 enum class TokenType
 {
-	SIMPLECHAR,		// 即用来匹配的ASCII字符
 ///	NUMBER,			// {min, max} 中的数字
-///	WIDECHAR,		// 宽字符
-
+	SIMPLECHAR,		// 即用来匹配的ASCII字符
 	OR,				// |
 	STAR,			// *
 	PLUS,			// +

@@ -193,7 +193,7 @@ public:
 class NFAStoreEdge : public NFAEdge
 {
 public:
-	NFAStoreEdge(NFAState* start, NFAState* end, std::string name);
+	NFAStoreEdge(NFAState* start, NFAState* end, const std::string &name);
 
 	bool Pass(Automaton* automaton, const std::string& content,
 		std::string::size_type &index);

@@ -1,3 +1,4 @@
+#include "Debug.h"
 #include <string>
 #include <cassert>
 #include <iostream>	
@@ -7,6 +8,7 @@
 #include "NFA.h"
 #include "Automaton.h"
 #include "AST.h"
+
 
 using std::cout;
 using std::endl;
@@ -26,6 +28,8 @@ void NFAState::ReverseEdgeOrder()
 	// 调用这个函数时，该状态只有两条出边，调整边的顺序是为了实现非贪婪匹配
 	std::reverse(outEdge_.begin(), outEdge_.end());
 }
+
+
 
 int NFAEdge::edgeCount = 0;
 Automaton* NFAEdge::automaton = nullptr;
@@ -157,6 +161,7 @@ bool NFASetRepeatEdge::Pass(Automaton* automaton, const std::string& content,
 }
 
 
+
 void NFASetRepeatEdge::SetEdges(NFARepeatEdge* repeat, NFAExitEdge* exit)
 {
 	repeatEdge_ = repeat;
@@ -188,6 +193,7 @@ bool NFAExitEdge::Pass(Automaton* automaton, const std::string& content,
 {
 	return pass_;
 }
+
 
 
 NFARangeEdge::NFARangeEdge(NFAState* start, NFAState* end, char lhs, char rhs) :
@@ -241,24 +247,22 @@ bool NFAReferenceEdge::Pass(Automaton* automaton, const std::string& content,
 	std::string::size_type &index)
 {
 	auto pair = automaton->GetCaptureContent(name_);
-	//std::cout << "pass func " << pair.first << " " << pair.second <<
-	//	" index = " << index << endl;
 
 	// 若 pair.first == -1 则说明还没捕获到内容
-	// TODO 可能出现这种情况吗 在语法分析已经证明不可能了把
 	if (pair.first == -1)
 		return true;
 
 	// first 值为 -2 表示捕获到空内容
 	if (pair.first == -2)
 		return true;
+
 	// 判断未匹配的内容长度是否足够，若不足够则不能通过
 	if (pair.second - pair.first > content.size() - index)
 		return false;
 		
-	
 	for (auto i = pair.first; i < pair.second; ++i)
 		if (content[i] != content[index++])	return false;
+
 	return true;
 }
 
@@ -277,6 +281,7 @@ bool NFAAnchorEdge::Pass(Automaton* automaton, const std::string& content,
 		if (std::isalnum(ch) || ch == '_') return true;
 		else return false;
 	};
+
 	// 单行模式中 ^ 表示段首			$ 表示段尾
 	// 多行模式中 ^ 表示行首(\n)之后	$ 表示行尾(\n)之前
 	switch (type_)
@@ -288,7 +293,6 @@ bool NFAAnchorEdge::Pass(Automaton* automaton, const std::string& content,
 		break;
 
 	case AnchorType::END:
-		// TODO 这里的 size - 1 会溢出
 		if (automaton->singleLine_ && index == content.size()) return true;
 		if (!automaton->singleLine_ &&
 			(index == content.size() ||
@@ -330,7 +334,7 @@ bool NFAStartEdge::Pass(Automaton* automaton, const std::string& content,
 
 
 
-NFAStoreEdge::NFAStoreEdge(NFAState* start, NFAState* end, std::string name) :
+NFAStoreEdge::NFAStoreEdge(NFAState* start, NFAState* end, const std::string &name) :
 	NFAEdge(start, end), name_(name)
 {
 }
@@ -338,10 +342,7 @@ NFAStoreEdge::NFAStoreEdge(NFAState* start, NFAState* end, std::string name) :
 bool NFAStoreEdge::Pass(Automaton* automaton, const std::string& content,
 	std::string::size_type &index)
 {
-	//cout << name_ << endl;
-	
 	// 即该捕获为空，说明里面的正则表达式匹配的内容为空，则不放进捕获列表
-	// 那引用的内容为空怎么办
 	if (lhs_ != index)
 		automaton->PushPair(name_, lhs_, index);
 	return true;
@@ -366,7 +367,6 @@ bool NFALookaheadEdge::Pass(Automaton* automaton, const std::string& content,
 {
 	int indexTemp = index;
 	int result = automaton->DFSNFA(lookaheadStart_, content, indexTemp, false);
-	//cout << "预查到的位置: " << result << endl;
-	//cout << "negate: " << negate_ << endl;
+
 	return result == -1 && negate_ || result != -1 && !negate_;
 }

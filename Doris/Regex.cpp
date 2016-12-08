@@ -1,7 +1,7 @@
+#include "Debug.h"
 #include <string>
 #include <iostream>
 #include <utility>
-#include "Debug.h"
 #include "Regex.h"
 
 using std::string;

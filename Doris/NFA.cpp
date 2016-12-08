@@ -221,13 +221,11 @@ bool NFACharClassEdge::Pass(Automaton* automaton, const std::string& content,
 	std::string::size_type &index)
 {
 	if (index >= content.size()) return false;
+
 	auto tempIndex = index++;
 	for (auto range : ranges_)
-	{
-		//cout << "range: " << range.first << " " << range.second << " match " << content[tempIndex] << endl;
 		if (range.first <= content[tempIndex] && content[tempIndex] <= range.second)
 			return true;
-	}
 		
 	return false;
 }

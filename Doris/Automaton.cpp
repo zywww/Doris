@@ -120,6 +120,7 @@ int	Automaton::DFSNFAforMatch(NFAState* state, const std::string& content, int i
 				return result;
 		}
 		
+
 		
 	}
 	return -1;

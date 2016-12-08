@@ -1,6 +1,7 @@
 #ifndef DORIS_DEBUG_H__
 #define DORIS_DEBUG_H__
 
+#include <xmmintrin.h>
 #include <ctime>
 #define DORIS_TOTAL_DEBUG
 #define DORIS_DEBUG

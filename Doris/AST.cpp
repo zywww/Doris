@@ -86,8 +86,6 @@ void ASTCat::Push(ASTNode* node)
 // 可以证明每个结构生成的 NFA 的 start 状态只有出边，end 状态只有入边
 std::pair<NFAState*, NFAState*> ASTCat::ConstructNFA()
 {
-	assert(nodeVec_.size() != 0);
-	
 	auto pair = nodeVec_[0]->ConstructNFA();
 	auto start = pair.first;
 	auto end = pair.second;

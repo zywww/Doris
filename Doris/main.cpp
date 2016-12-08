@@ -4,6 +4,7 @@
 #include <cassert>
 #include <algorithm>
 #include <ctime>
+#include <xmmintrin.h>
 #include "Lexer.h"
 #include "Parser.h"
 #include "Regex.h"

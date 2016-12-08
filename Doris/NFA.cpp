@@ -335,7 +335,8 @@ bool NFAStartEdge::Pass(Automaton* automaton, const std::string& content,
 
 
 NFAStoreEdge::NFAStoreEdge(NFAState* start, NFAState* end, const std::string &name) :
-	NFAEdge(start, end), name_(name)
+	NFAEdge(start, end), 
+	name_(name)
 {
 }
 

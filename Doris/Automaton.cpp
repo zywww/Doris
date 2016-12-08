@@ -33,6 +33,8 @@ Automaton::~Automaton()
 		delete state;
 	for (auto edge : edgePool_)
 		delete edge;
+	NFAEdge::automaton = nullptr;
+	NFAState::automaton = nullptr;
 }
 
 

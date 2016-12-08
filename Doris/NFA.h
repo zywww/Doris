@@ -36,6 +36,7 @@ public:
 	static int edgeCount;
 
 	NFAEdge(NFAState* start, NFAState* end);
+	virtual ~NFAEdge() { }
 
 	// 用于连接时合并两个状态
 	void		 ChangeStartState(NFAState* newStart);
@@ -194,6 +195,7 @@ class NFAStoreEdge : public NFAEdge
 {
 public:
 	NFAStoreEdge(NFAState* start, NFAState* end, const std::string &name);
+	//NFAStoreEdge(NFAState* start, NFAState* end) :NFAEdge(start, end) {}
 
 	bool Pass(Automaton* automaton, const std::string& content,
 		std::string::size_type &index);

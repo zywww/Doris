@@ -315,12 +315,13 @@ void test()
 	//testLexer();
 	//testParser();
 	//testNFA();
-	//testMatch();
+	testMatch();
 	//testTime();
 	
 	
-	
-	Regex re("()");
+
+	//Regex re("()");
+
 
 	/*assert(Regex("(a*)*").Match("aaaa") == true);
 	assert(Regex("(a*)*|bbb").Match("bbb") == true);
@@ -348,10 +349,10 @@ void test()
 
 int main()
 {
-	//_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
-	//_CrtSetBreakAlloc(248);
 	test();
 	
+
+
 	_CrtDumpMemoryLeaks();
 	system("pause");
 	return 0;

@@ -1,12 +1,10 @@
 #include "Debug.h"
-#include <crtdbg.h>
 #include <iostream>	
 #include <cstdlib>
 #include <string>
 #include <cassert>
 #include <algorithm>
 #include <ctime>
-#include <xmmintrin.h>
 #include "Lexer.h"
 #include "Parser.h"
 #include "Regex.h"
@@ -320,26 +318,11 @@ void test()
 	
 	
 
-	//Regex re("()");
-
-
-	/*assert(Regex("(a*)*").Match("aaaa") == true);
-	assert(Regex("(a*)*|bbb").Match("bbb") == true);
-	assert(Regex("[ab]*").Match("bbb") == true);
-	assert(Regex("([ab]*)").Match("bbb") == true);
-	assert(Regex("a+").Match("") == false);
-	assert(Regex("a+").Match("a") == true);
-	assert(Regex("a+").Match("aaa") == true);
-	assert(Regex("a?").Match("aaa") == false);
-	assert(Regex("a?").Match("a") == true);
-	assert(Regex("a?").Match("") == true);*/
-	
 	
 
 
 	// TODO 将 dfs 改成非递归
 	// TODO 剪枝函数，遍历一遍，确定每个状态所需剩余的字符个数
-	// TODO 用函数检测内存泄漏
 	// TODO 应该把 (?: (?= (?! \k<name> 等等分析为一个词法单元吗？看看别的实现
 	// TODO 将函数内联
 	//std::vector<int> ivec(8000000);
@@ -351,7 +334,7 @@ int main()
 {
 	test();
 	
-
+	new int[10];
 
 	_CrtDumpMemoryLeaks();
 	system("pause");

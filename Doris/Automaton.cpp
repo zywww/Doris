@@ -1,7 +1,9 @@
 #include <iostream>	
+#include <vector>
 #include "Automaton.h"
 #include "Debug.h"
 
+using std::vector;
 using std::string;
 using std::pair;
 using std::make_pair;
@@ -24,7 +26,7 @@ Automaton::Automaton(ASTNode* root)
 
 #ifdef DORIS_DEBUG
 	end = clock();
-	std::cout << "gen NFA: " << (double)(end - start) << "s" << std::endl;
+	std::cout << "gen NFA: " << (double)(end - start) << "ms" << std::endl;
 #endif
 }
 Automaton::~Automaton()
@@ -57,21 +59,22 @@ pair<int, int> Automaton::RunNFA(const std::string& content, int startIndex, boo
 	int result;
 	if (match)
 		result = DFSNFAforMatch(start_, content, startIndex);
+		//result = DFSNFAforMatchIteration(start_, content);
 	
-	//std::cout << dfsTime << std::endl;
 	if (result == -1)
 		return make_pair(-1, -1);
 	else
 		return make_pair(startIndex, result);
 }
 
+
 unsigned long long Automaton::dfsTime = 0;
+
 int	Automaton::DFSNFA(NFAState* state, const std::string& content, int index, bool matchNotGreedy)
 {
-	
 	++dfsTime;
 	if (state->accept_)  return index; 
-	//if (state == end_) return index;
+
 	for (auto edge : state->outEdge_)
 	{
 		size_t indexTemp = index;
@@ -79,51 +82,98 @@ int	Automaton::DFSNFA(NFAState* state, const std::string& content, int index, bo
 		if (edge->Pass(this, content, indexTemp))
 		{
 			int result = DFSNFA(edge->end_, content, indexTemp, matchNotGreedy);
-			//std::cout << "matchNotGreedy:" << matchNotGreedy << std::endl;
+
 
 			// 如果是匹配，且表达式里有非贪婪匹配，则当匹配到整个表达式才返回匹配到的位置
 			// 如果不是匹配，或者表达式中没有非贪婪匹配，也就意味着是搜索或者是完全贪婪的匹配，
 			// 则只要找到就返回位置
 			if (matchNotGreedy && result == content.size() ||
 				!matchNotGreedy && result >= 0)
-				return result;
-			
-				
-			
-			/*
-			if (result >= 0)
-				return result;
-			*/
+				return result;			
+
 		}
 	}
+
 	return -1;
 }
 
+
 int	Automaton::DFSNFAforMatch(NFAState* state, const std::string& content, int index)
 {
-	++dfsTime;
+	++dfsTime; // 用于统计 该函数调用的次数
 	if (state->accept_)  return index;
-	//if (state == end_) return index;
+
+	// 从该状态出发的每一条边
+	for (auto edge : state->outEdge_)
+	{
+		size_t indexTemp = index;	
+		
+		// 如果该边可以通过，则递归调用 dfs 该边的结束状态
+		if (edge->Pass(this, content, indexTemp))
+		{
+			int result = DFSNFAforMatch(edge->end_, content, indexTemp);
+
+			// 如果整个表达式都匹配了，则返回结果
+			if (result == content.size())
+				return result;
+		}
+	}
+
+	// 如果所有匹配都不成功，则返回 -1
+	return -1;
+}
+
+int	Automaton::DFSNFAforSearch(NFAState* state, const std::string& content, int index)
+{
+	++dfsTime; // 用于统计 该函数调用的次数
+	if (state->accept_)  return index;
+
+	// 从该状态出发的每一条边
 	for (auto edge : state->outEdge_)
 	{
 		size_t indexTemp = index;
 
-		
-		// 调用 pass 的时候，由 pass 函数内部判断指针是否合法，不合法则不能通过
+		// 如果该边可以通过，则递归调用 dfs 该边的结束状态
 		if (edge->Pass(this, content, indexTemp))
 		{
-			int result = DFSNFAforMatch(edge->end_, content, indexTemp);
-			//std::cout << "matchNotGreedy:" << matchNotGreedy << std::endl;
+			int result = DFSNFAforSearch(edge->end_, content, indexTemp);
 
-			// 如果是匹配，且表达式里有非贪婪匹配，则当匹配到整个表达式才返回匹配到的位置
-			// 如果不是匹配，或者表达式中没有非贪婪匹配，也就意味着是搜索或者是完全贪婪的匹配，
-			// 则只要找到就返回位置
-			if (result == content.size())
+			// 如果搜索到结果，不管长度是多少都返回
+			if (result != -1)
 				return result;
 		}
-		
-
-		
 	}
+
+	// 如果所有匹配都不成功，则返回 -1
+	return -1;
+}
+
+// 迭代居然比递归慢了 5 倍
+int	Automaton::DFSNFAforMatchIteration(NFAState *state, const std::string& content, int index)
+{
+	vector<pair<NFAState*, size_t>> stk;
+	stk.push_back(make_pair(start_, 0));
+	//int max = 0;
+	while (!stk.empty())
+	{
+		//max = max > stk.size() ? max : stk.size();
+		++dfsTime;
+		auto pair = stk.back();
+		stk.pop_back();
+		if (pair.first->accept_ && pair.second == content.size())
+			return pair.second;
+
+		decltype(stk) stkTemp;
+		for (auto edge : pair.first->outEdge_)
+		{
+			size_t indexTemp = pair.second;
+			if (edge->Pass(this, content, indexTemp))
+				stkTemp.push_back(make_pair(edge->end_, indexTemp));
+		}
+		
+		for (auto i = stkTemp.rbegin(); i != stkTemp.rend(); ++i)
+			stk.push_back(*i);
+	}
+	//std::cout << "stk max size " << max << std::endl;
 	return -1;
 }

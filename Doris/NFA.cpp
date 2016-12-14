@@ -367,7 +367,7 @@ bool NFALookaheadEdge::Pass(Automaton* automaton, const std::string& content,
 	std::string::size_type &index)
 {
 	int indexTemp = index;
-	int result = automaton->DFSNFA(lookaheadStart_, content, indexTemp, false);
+	int result = automaton->DFSNFAforSearch(lookaheadStart_, content, indexTemp);
 
 	return result == -1 && negate_ || result != -1 && !negate_;
 }

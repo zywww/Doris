@@ -28,7 +28,7 @@ Parser::Parser(const string &regex) :
 
 #ifdef DORIS_DEBUG
 	end = clock();
-	cout << "Parser: " << (double)(end - start)  << "s" << endl;
+	cout << "Parser: " << (double)(end - start)  << "ms" << endl;
 #endif
 }
 

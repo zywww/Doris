@@ -25,7 +25,7 @@ bool Regex::Match(const string& matchContent)
 
 #ifdef DORIS_DEBUG
 	end = clock();
-	std::cout << "Match: " << (double)(end - start) << "s" << std::endl;
+	std::cout << "Match: " << (double)(end - start) << "ms" << std::endl;
 #endif
 
 	if (pair.second == matchContent.size())	return true;

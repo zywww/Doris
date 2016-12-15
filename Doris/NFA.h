@@ -130,6 +130,7 @@ public:
 };
 
 
+/*
 class NFARangeEdge : public NFAEdge
 {
 public:
@@ -141,6 +142,7 @@ public:
 	char lhs_;
 	char rhs_;
 };
+*/
 
 class NFACharClassEdge : public NFAEdge
 {

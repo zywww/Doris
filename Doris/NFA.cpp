@@ -195,7 +195,7 @@ bool NFAExitEdge::Pass(Automaton* automaton, const std::string& content,
 }
 
 
-
+/*
 NFARangeEdge::NFARangeEdge(NFAState* start, NFAState* end, char lhs, char rhs) :
 	NFAEdge(start, end), lhs_(lhs), rhs_(rhs)
 {
@@ -210,7 +210,7 @@ bool NFARangeEdge::Pass(Automaton* automaton, const std::string& content,
 	else
 		return false;
 }
-
+*/
 
 
 NFACharClassEdge::NFACharClassEdge(NFAState* start, NFAState* end) :

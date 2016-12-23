@@ -14,6 +14,8 @@ class NFARepeatEdge;
 class NFASetRepeatEdge;
 class NFAStoreEdge;
 
+//void InitNFAMustLength(NFAState* state);
+
 class NFAState
 {
 public:
@@ -26,6 +28,7 @@ public:
 	std::vector<NFAEdge*> inEdge_;
 	std::vector<NFAEdge*> outEdge_;
 	bool				  accept_ = false;
+//	int					  mustLength = -1;
 };
 
 

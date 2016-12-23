@@ -148,6 +148,8 @@ int	Automaton::DFSNFAforSearch(NFAState* state, const std::string& content, int 
 	return -1;
 }
 
+
+/*
 // 迭代居然比递归慢了 5 倍
 int	Automaton::DFSNFAforMatchIteration(NFAState *state, const std::string& content, int index)
 {
@@ -177,3 +179,4 @@ int	Automaton::DFSNFAforMatchIteration(NFAState *state, const std::string& conte
 	//std::cout << "stk max size " << max << std::endl;
 	return -1;
 }
+*/

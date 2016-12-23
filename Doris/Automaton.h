@@ -28,7 +28,7 @@ public:
 
 	int					DFSNFAforMatch(NFAState* start, const std::string& content, int startIndex = 0);
 	int					DFSNFAforSearch(NFAState* start, const std::string& content, int startIndex = 0);
-	int					DFSNFAforMatchIteration(NFAState *state, const std::string& content, int startIndex = 0);
+	
 
 	// 匿名和命名捕获的内容都存放在这里
 	// name begin, end

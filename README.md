@@ -50,5 +50,5 @@ $ 匹配必须出现在字符串的末尾或出现在行或字符串末尾的 \n
 \k\<name\> 命名后向引用。 匹配命名表达式的值。   
 
 ##参考
-[《构造正则表达式引擎》](http://www.cppblog.com/vczh/archive/2008/05/22/50763.html) 
+[《构造正则表达式引擎》](http://www.cppblog.com/vczh/archive/2008/05/22/50763.html)   
 龙书  
